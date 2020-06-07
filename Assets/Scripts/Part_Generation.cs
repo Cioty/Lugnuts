@@ -7,6 +7,9 @@ public class Cell
 {
     public Vector3Int position;
     public Part occupyingPart = null;
+    // Stores an index that refers to the index this cell is stored at in the master blueprint. This is really dodgy. 
+    // This is specifically used to find the parent Node assiociated with a cell within the index.
+    public int nodeIndex;
 }
 
 public class Part
@@ -15,11 +18,11 @@ public class Part
     public bool flip = false;
     public bool[] requiredSpace = null;
 
-    //Use index values
-    //-1 = null
-    // 0 = socket
-    // 1 = part
-    // 2 = blocked
+    // Use index values
+    // -1 = null
+    //  0 = socket
+    //  1 = part
+    //  2 = blocked
     public int useIndex = -1;
 
     // todo add weight
@@ -35,6 +38,23 @@ public enum Axis
     X,
     Y,
     Z
+}
+
+public class Node
+{
+    public List<Node> children;
+    public List<Node> parents;
+
+    public float totalWeight;
+    public int id;
+
+    //shape is the number at the end of prefabPart
+    public int shape;
+    //color is currently arbitrary/nonimplemented
+    public int color;
+
+    //This reference allows a script on the part to interact with the tree.
+    GameObject partObject;
 }
 
 public class Part_Generation: MonoBehaviour
@@ -70,10 +90,15 @@ public class Part_Generation: MonoBehaviour
     //celldict declaration for grid
     Dictionary<Vector3Int, Cell> cellDict;
 
+    private Vector3Int[] adjCellTransforms;
+
     //Test Transform
     public Transform centreTransform;
 
     public int gridRange = 2;
+
+    //Tree-related variables
+    List<Node> masterBlueprint;
     #endregion
 
     private void Start()
@@ -119,6 +144,16 @@ public class Part_Generation: MonoBehaviour
         blocked = new Part { useIndex = 2 };
 
         #endregion
+
+        //Grid declaration
+        masterBlueprint = new List<Node>();
+
+        // adjCellTransforms definition. Used in the GetAdj() method.
+        adjCellTransforms = new Vector3Int[6]
+        {
+            new Vector3Int(0, -1, 1), new Vector3Int(-1, 0, 1), new Vector3Int(-1, 1, 0),
+            new Vector3Int(0, 1, -1), new Vector3Int(1, 0, -1), new Vector3Int(1, -1, 0)
+        };
 
         #region generate the grid
 
@@ -324,15 +359,17 @@ public class Part_Generation: MonoBehaviour
         // Orientation is the orientation of the socket-generating part. 0 is down and incrementing moves the socket-part clockwise around initPos
         cellDict[position].occupyingPart = part;
         cellDict[position].occupyingPart.rotation = orientation;
+        // The current maximum +1, since this will always be added on and we're never deleting anything. This is fragile. 
+        cellDict[position].nodeIndex = masterBlueprint.Count;
 
-        
         //Test instantiation of part
-        var s = 0.25f;
+        /* var s = 0.25f;
         float xValue = Mathf.Sqrt(3f) * s * (position.y / 2f + position.x);
         float yValue = 3f / 2f * s * position.y;
         Instantiate(part.prefab, new Vector3(centreTransform.position.x + xValue, centreTransform.position.y + yValue, centreTransform.position.z), Quaternion.Euler(0,0,0), centreTransform);
-        
+        */
 
+        #region set sockets
         // array of positions for the search. Taken from CellTransform
         List<Cell> rotarySearch = GetAdj(position);
 
@@ -357,17 +394,38 @@ public class Part_Generation: MonoBehaviour
                     Debug.Log("Adjacent Cell Status = " + searchedCell.occupyingPart.prefab);
                 }  
             }
-        }         
+        }
+        #endregion
+
+        #region add to tree
+        // requiredSpace being false shows this is a core part.
+        if (!part.requiredSpace[0])
+        {
+            masterBlueprint.Add(new Node());
+            // Add reference to the part with the script on it to this node later on. 
+            // This reference will be used to assign an id to each part on when ids are assigned to nodes. 
+            // This reference will allow the part's script to access itself in the tree;  
+        }
+        else
+        {
+            Node currentNode = new Node
+            {
+                //This moves one cell in the opposite of the orientation and adds the Node at Cell.nodeIndex in masterBlueprint
+                parents = new List<Node> { masterBlueprint[cellDict[position + adjCellTransforms[orientation]].nodeIndex] }
+            };
+
+            masterBlueprint.Add(currentNode);
+
+            //this is supposed to add currentNode to the child list of the parent node.
+            masterBlueprint[cellDict[position + adjCellTransforms[orientation]].nodeIndex].children.Add(masterBlueprint[masterBlueprint.Count - 1]);
+
+            // Same thing as above with the part reference
+        }
+        #endregion
     }
 
     List<Cell> GetAdj(Vector3Int c)
     {
-        Vector3Int[] adjCellTransforms = new Vector3Int[6]
-        {
-            new Vector3Int(0, -1, 1), new Vector3Int(-1, 0, 1), new Vector3Int(-1, 1, 0),
-            new Vector3Int(0, 1, -1), new Vector3Int(1, 0, -1), new Vector3Int(1, -1, 0)
-        };
-
         List<Cell> adjacentCells = new List<Cell>();
 
         foreach (Vector3Int transform in adjCellTransforms)
