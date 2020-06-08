@@ -25,12 +25,17 @@ public class Part
     //  2 = blocked
     public int useIndex = -1;
 
-    // todo add weight
+    // weight determines the id order. Generates a value for each part instance between min and max
+    public float weightMin;
+    public float weightMax;
 
     // rotation handles:
     // core rotation (to do)
     // socket orientation
     public int rotation = -1;
+
+    public int shape;
+    public int color;
 }
 
 public enum Axis
@@ -99,45 +104,55 @@ public class Part_Generation: MonoBehaviour
 
     //Tree-related variables
     List<Node> masterBlueprint;
+
+    //Number of colours
+    public int colorNumber = 3;
     #endregion
 
     private void Start()
     {
 
         #region part Library definitions
-        
+        //weights. Variable name refers to sockets on the part.
+        float doubleMin = 30f;
+        float doubleMax = 70f;
+        float singleMin = 30f;
+        float singleMax = 30f;
+        float capMin    = 30f;
+        float capMax    = 30f;
+
         // oh boy here I go hardcoding every part in a single array
         partLibrary = new Part[10]
         {
             //part 1                index 00
-            new Part {useIndex = 1, prefab = prefabPart01, flip = false, requiredSpace = new bool[6] {true, false, false, true, false, false}},
+            new Part {useIndex = 1, prefab = prefabPart01, flip = false, requiredSpace = new bool[6] {true, false, false, true, false, false}, weightMin = singleMin, weightMax = singleMax, shape = 1 },
             //part 2 and flips      index 01, 02
-            new Part {useIndex = 1, prefab = prefabPart02, flip = false, requiredSpace = new bool[6] {true, false, true, false, false, false}},
-            new Part {useIndex = 1, prefab = prefabPart02, flip = true, requiredSpace = new bool[6] {true, false, false, false, true, false}},
+            new Part {useIndex = 1, prefab = prefabPart02, flip = false, requiredSpace = new bool[6] {true, false, true, false, false, false}, weightMin = singleMin, weightMax = singleMax, shape = 2 },
+            new Part {useIndex = 1, prefab = prefabPart02, flip = true, requiredSpace = new bool[6] {true, false, false, false, true, false}, weightMin = singleMin, weightMax = singleMax, shape = 2 },
             //part 3 and flips      index 03, 04
-            new Part {useIndex = 1, prefab = prefabPart03, flip = false, requiredSpace = new bool[6] {true, true, false, false, false, false}},
-            new Part {useIndex = 1, prefab = prefabPart03, flip = true, requiredSpace = new bool[6] {true, false, false, false, false, true}},
+            new Part {useIndex = 1, prefab = prefabPart03, flip = false, requiredSpace = new bool[6] {true, true, false, false, false, false}, weightMin = singleMin, weightMax = singleMax, shape = 3 },
+            new Part {useIndex = 1, prefab = prefabPart03, flip = true, requiredSpace = new bool[6] {true, false, false, false, false, true}, weightMin = singleMin, weightMax = singleMax, shape = 3 },
             //part 4 and flips      index 05, 06
-            new Part {useIndex = 1, prefab = prefabPart04, flip = false, requiredSpace = new bool[6] {true, false, true, true, false, false}},
-            new Part {useIndex = 1, prefab = prefabPart04, flip = true, requiredSpace = new bool[6] {true, false, false, true, true, false}},
+            new Part {useIndex = 1, prefab = prefabPart04, flip = false, requiredSpace = new bool[6] {true, false, true, true, false, false}, weightMin = doubleMin, weightMax = doubleMax, shape = 4 },
+            new Part {useIndex = 1, prefab = prefabPart04, flip = true, requiredSpace = new bool[6] {true, false, false, true, true, false}, weightMin = doubleMin, weightMax = doubleMax, shape = 4 },
             //part 5 and flips      index 07, 08
-            new Part {useIndex = 1, prefab = prefabPart05, flip = false, requiredSpace = new bool[6] {true, false, true, false, false, true}},
-            new Part {useIndex = 1, prefab = prefabPart05, flip = true, requiredSpace = new bool[6] {true, true, false, false, true, false}},
+            new Part {useIndex = 1, prefab = prefabPart05, flip = false, requiredSpace = new bool[6] {true, false, true, false, false, true}, weightMin = doubleMin, weightMax = doubleMax, shape = 5 },
+            new Part {useIndex = 1, prefab = prefabPart05, flip = true, requiredSpace = new bool[6] {true, true, false, false, true, false}, weightMin = doubleMin, weightMax = doubleMax, shape = 5 },
             //part 6                index 09
-            new Part {useIndex = 1, prefab = prefabPart06, flip = false, requiredSpace = new bool[6] {true, false, true, false, true, false}}
+            new Part {useIndex = 1, prefab = prefabPart06, flip = false, requiredSpace = new bool[6] {true, false, true, false, true, false}, weightMin = doubleMin, weightMax = doubleMax, shape = 6 }
         };
 
         endPartLibrary = new Part[1]
         {
             //endPart 1
-            new Part {useIndex = 1, prefab = prefabPart00, flip = false, requiredSpace = new bool[6] {true, false, false, false, false, false}},
+            new Part {useIndex = 1, prefab = prefabPart00, flip = false, requiredSpace = new bool[6] {true, false, false, false, false, false}, weightMin = capMin, weightMax = capMax }
         };
 
         // note, requiredSpace[0] is true on parts but false on cores. This is used in SetPart to determine is a part is a core.
         coreLibrary = new Part[1]
         {
             //core 1.               index 00
-            new Part {useIndex = 1, prefab = prefabCore01, flip = false, requiredSpace = new bool[6] {false, true, true, false, true, true}}
+            new Part {useIndex = 1, prefab = prefabCore01, flip = false, requiredSpace = new bool[6] {false, true, true, false, true, true}, shape = 0}
         };
 
         socket = new Part { useIndex = 0 };
@@ -185,51 +200,81 @@ public class Part_Generation: MonoBehaviour
         SetPart(coreGen, 0, Vector3Int.zero);
 
         //this while loop does all the non-core part placement.
-        //while (socketPositions.Count < 0)
-        //{
-        //    //chooses a random socket from the socketPositions list
-        //    var randomSocket = UnityEngine.Random.Range(0, socketPositions.Count);
-        //
-        //    List<Cell> adjacentCells = CellCheck(socketPositions[randomSocket], cellDict[socketPositions[randomSocket]].occupyingPart.rotation);
-        //
-        //    List<Part> validPartChoices = new List<Part>();
-        //
-        //    foreach (var item in partLibrary)
-        //    {
-        //        //i == 1 because you never have to check the centre hex since there should always be a socket there.
-        //        for (int i = 1; i < adjacentCells.Count; i++)
-        //        {
-        //            //returns true if you can't add the part. You can't add it if occupyingPart isn't null when requiredSpace is true 
-        //            if (adjacentCells[i].occupyingPart != null && cellDict[socketPositions[randomSocket]].occupyingPart.requiredSpace[i])
-        //            {
-        //                break;
-        //            }
-        //            
-        //            if (i==adjacentCells.Count-1)
-        //            {
-        //                validPartChoices.Add(item);
-        //            }
-        //        }
-        //    }
-        //
-        //    SetPart
-        //        (
-        //            validPartChoices[UnityEngine.Random.Range(0, 
-        //            validPartChoices.Count)], cellDict[socketPositions[randomSocket]].occupyingPart.rotation, 
-        //            socketPositions[randomSocket]
-        //        );
-        //
-        //    socketPositions.RemoveAt(randomSocket);
-        //
-        //}
+        while (socketPositions.Count > 0)
+        {
+            //chooses a random socket from the socketPositions list
+            var randomSocket = UnityEngine.Random.Range(0, socketPositions.Count);
 
+            List<Cell> adjacentCells = CellCheck(socketPositions[randomSocket], cellDict[socketPositions[randomSocket]].occupyingPart.rotation);
+
+            List<Part> validPartChoices = new List<Part>();
+
+            foreach (var item in partLibrary)
+            {
+                //i == 1 because you never have to check the centre hex since there should always be a socket there.
+                for (int i = 1; i < adjacentCells.Count; i++)
+                {
+                    //returns true if you can't add the part. You can't add it if occupyingPart isn't null when requiredSpace is true 
+                    if (adjacentCells[i].occupyingPart != null && item.requiredSpace[i])
+                    {
+                        break;
+                    }
+
+                    if (i == adjacentCells.Count - 1)
+                    {
+                        validPartChoices.Add(item);
+                    }
+                }
+            }
+
+            //This adds end-pieces seperately so we have more control
+            if (validPartChoices.Count == 0 || (socketPositions.Count > 2))
+            {
+                //Adding only one endpart allows for variation in endParts to be added without making them more common in generation
+                validPartChoices.Add(endPartLibrary[UnityEngine.Random.Range(0, endPartLibrary.Length)]);
+            }
+
+            //Debug.Log(validPartChoices.Count);
+            //foreach (Part part in validPartChoices)
+            //{
+            //    Debug.Log(part.prefab);
+            //}
+
+            SetPart
+                (
+                    validPartChoices[UnityEngine.Random.Range(0, validPartChoices.Count)],
+                    cellDict[socketPositions[randomSocket]].occupyingPart.rotation,
+                    socketPositions[randomSocket]
+                );
+
+            socketPositions.RemoveAt(randomSocket);
+        }
         #endregion
 
+        //Sort through the tree and add ids in order of weight;
+        //masterBlueprint.Sort(Comparison(float ))
 
+    }
+
+    public List<Node> Descendents(List<int> ancestorIds)
+    {
+        var returnList = new List<Node>();
+
+        foreach (int index in ancestorIds)
+        {
+            foreach (var item in masterBlueprint[index].children)
+            {
+                returnList.Add(item);
+            } 
+        }
+
+        return returnList;
     }
 
     private void Update()
     {
+        #region old generation code
+        /*
         if (Input.GetKeyDown(KeyCode.R))
         {
 
@@ -290,6 +335,7 @@ public class Part_Generation: MonoBehaviour
             }
          }   
 
+        
         if (Input.GetKeyDown(KeyCode.L))
         {
             for (int i = -gridRange; i <= gridRange; i++)
@@ -315,12 +361,12 @@ public class Part_Generation: MonoBehaviour
                 }
             }
         }
-
+        
         if (Input.GetKeyDown(KeyCode.O))
         {
             Debug.Log(socketPositions.Count);
-        }
-        
+        }*/
+        #endregion
     }
 
     public List<Cell> CellCheck(Vector3Int initPos, int orientation)
@@ -401,17 +447,24 @@ public class Part_Generation: MonoBehaviour
         // requiredSpace being false shows this is a core part.
         if (!part.requiredSpace[0])
         {
-            masterBlueprint.Add(new Node());
+            Node currentNode = new Node();
+            currentNode.totalWeight = 0;
+            masterBlueprint.Add(currentNode);
             // Add reference to the part with the script on it to this node later on. 
             // This reference will be used to assign an id to each part on when ids are assigned to nodes. 
             // This reference will allow the part's script to access itself in the tree;  
         }
         else
         {
+            // This moves one cell in the opposite of the orientation and adds the Node at Cell.nodeIndex in masterBlueprint
+            var parentNode = masterBlueprint[cellDict[position + adjCellTransforms[orientation]].nodeIndex];
+
             Node currentNode = new Node
             {
-                //This moves one cell in the opposite of the orientation and adds the Node at Cell.nodeIndex in masterBlueprint
-                parents = new List<Node> { masterBlueprint[cellDict[position + adjCellTransforms[orientation]].nodeIndex] }
+                parents = new List<Node> { parentNode },
+                totalWeight = parentNode.totalWeight + UnityEngine.Random.Range(part.weightMin, part.weightMax),
+                shape = part.shape,
+                color = UnityEngine.Random.Range(0, colorNumber)
             };
 
             masterBlueprint.Add(currentNode);
@@ -442,5 +495,30 @@ public class Part_Generation: MonoBehaviour
         }
 
         return adjacentCells;
+    }
+
+    public List<Node> SubsetBlueprint(int index)
+    {
+        List<Node> returnList = new List<Node>();
+        // gets all the nodes with an id at or below index
+        foreach (Node item in masterBlueprint)
+        {
+            if(item.id <= index)
+            {
+                var itemContainer = item;
+                foreach (var child in itemContainer.children)
+                {
+                    if (child.id <= index)
+                    {
+                        // removes children that are out of range from the nodes.
+                        itemContainer.children.Remove(child);
+                    }
+                }
+                // adds sanitised nodes to the return array
+                returnList.Add(itemContainer);
+            }
+        }
+
+        return returnList;
     }
 }
