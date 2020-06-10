@@ -11,15 +11,23 @@ public class NickTestScript : MonoBehaviour
     public Transform player;
     public GameObject mePiece;
     public Rigidbody piece;
-    private bool holdingPiece = false;
+    [HideInInspector]
+    public bool holdingPiece = false;
     public bool lookedAt = false;
-    public SphereCollider entrancePeg;
-    public int pieceValue;
-    public Text pieceDisplay; 
+    public Material hoverMaterial;
+    public Material baseMaterial;
+    //public Transform connectionArea;
+    //public GameObject[] connectionPoints;
 
     void Start()
     {
         piece = this.gameObject.GetComponent<Rigidbody>();
+        /*
+        for(int i = 0; i <= connectionPoints.Length; i++)
+        {
+            connectionPoints[i].GetComponent<ArmChecker>().connectionNumber = i;
+        }
+        */
     }
 
     public void pieceInteract()
@@ -29,7 +37,7 @@ public class NickTestScript : MonoBehaviour
             piece.transform.parent = myHand.transform;
             holdingPiece = true;
             piece.isKinematic = true;
-           mePiece.transform.rotation = Quaternion.LookRotation(myHand.position);
+            mePiece.transform.rotation = Quaternion.LookRotation(myHand.position);
 
         }
         else if (holdingPiece == true)
@@ -37,34 +45,20 @@ public class NickTestScript : MonoBehaviour
             piece.transform.parent = null;
             piece.isKinematic = false;
             holdingPiece = false;
-
+            
         }
     }
 
     public void ActiveLook()
     {
         this.gameObject.tag = "Respawn";
+        this.gameObject.GetComponent<Renderer>().material.color = hoverMaterial.color;
     }
     public void DeActiveLook()
     {
         this.gameObject.tag = "Untagged";
-    }
+        this.gameObject.GetComponent<Renderer>().material.color = baseMaterial.color;
 
-    public void OnTriggerEnter(Collider other)
-    {
-        if(other.tag == "Finish" && holdingPiece == false)
-        {
-            piece.isKinematic = true;
-            piece.useGravity = false;
-            pieceDisplay.text = pieceValue.ToString();
-        }
     }
-    public void OnTriggerExit(Collider other)
-    {
-        if (other.tag == "Finish" && holdingPiece == true)
-        {
-            piece.useGravity = true;
-            pieceDisplay.text = "0";
-        }
-    }
+    
 }
