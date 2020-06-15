@@ -28,13 +28,15 @@ public class Part
     // weight determines the id order. Generates a value for each part instance between min and max
     public float weightMin;
     public float weightMax;
+    // Part_generation variable that approximates the size of the part to determine how many parts should be generated. 
+    public float size;
 
     // rotation handles:
     // core rotation (to do)
     // socket orientation
-    public int rotation = -1;
+    public int rotation = 0;
 
-    public int shape;
+    public Shape shape;
     public int color;
 }
 
@@ -45,18 +47,32 @@ public enum Axis
     Z
 }
 
+public enum Shape
+{
+    prefabPart00,
+    prefabPart01,
+    prefabPart02,
+    prefabPart03,
+    prefabPart04,
+    prefabPart05,
+    prefabPart06
+}
+
 public class Node
 {
-    public List<Node> children;
-    public List<Node> parents;
+    public Node[] children;
+    public Node parent;
+    //childrenValid stores if the child is a valid part of the most recent sub-blueprint
+    public bool[] childrenValid;
 
     public float totalWeight;
     public int id;
 
     //shape is the number at the end of prefabPart
-    public int shape;
+    public Shape shape;
     //color is currently arbitrary/nonimplemented
     public int color;
+    public bool flipped;
 
     //This reference allows a script on the part to interact with the tree.
     GameObject partObject;
@@ -64,6 +80,13 @@ public class Node
 
 public class Part_Generation: MonoBehaviour
 {
+    #region references
+
+    public Part_Creator partCreator;
+    public Part_Manager partManager;
+
+    #endregion
+
     #region declarations
     // Array holding every part that exists besides the core nodes and end-parts
     Part[] partLibrary;
@@ -82,6 +105,7 @@ public class Part_Generation: MonoBehaviour
     public GameObject prefabPart04;
     public GameObject prefabPart05;
     public GameObject prefabPart06;
+    private GameObject[] prefabLibrary;
 
     //core part public variables
     public GameObject prefabCore01;
@@ -155,7 +179,16 @@ public class Part_Generation: MonoBehaviour
             new Part {useIndex = 1, prefab = prefabCore01, flip = false, requiredSpace = new bool[6] {false, true, true, false, true, true}, shape = 0}
         };
 
+        prefabLibrary = new GameObject[7] { prefabPart00,
+    prefabPart01,
+    prefabPart02,
+    prefabPart03,
+    prefabPart04,
+    prefabPart05,
+    prefabPart06};
+
         socket = new Part { useIndex = 0 };
+        Debug.Log("Socket rotation = " + socket.rotation);
         blocked = new Part { useIndex = 2 };
 
         #endregion
@@ -240,6 +273,21 @@ public class Part_Generation: MonoBehaviour
             //    Debug.Log(part.prefab);
             //}
 
+            Debug.Log("Socket rotation = " + socket.rotation);
+            foreach (Vector3Int position in socketPositions)
+            {
+                Debug.Log("rotation = " + cellDict[position].occupyingPart.rotation + ", useIndex = " + cellDict[position].occupyingPart.useIndex);
+            }
+            var randomPositionTest = new Vector3Int(0, 1, -1);
+            if (cellDict[randomPositionTest].occupyingPart == null)
+            {
+                Debug.Log(randomPositionTest + " is null");
+            } else
+            {
+                Debug.Log(randomPositionTest + " useIndex = " + cellDict[randomPositionTest].occupyingPart.useIndex + ", rotation = " + cellDict[randomPositionTest].occupyingPart.rotation);
+            }
+            Debug.Log("Socket rotation = " + socket.rotation);
+
             SetPart
                 (
                     validPartChoices[UnityEngine.Random.Range(0, validPartChoices.Count)],
@@ -251,9 +299,11 @@ public class Part_Generation: MonoBehaviour
         }
         #endregion
 
-        //Sort through the tree and add ids in order of weight;
-        //masterBlueprint.Sort(Comparison(float ))
+        //Sort through the tree and add ids in order of weight. Current implementation reorders the tree, breaking Cell.nodeIndex.
+        masterBlueprint = BubbleSortID(masterBlueprint);
 
+        partCreator.masterBlueprint = masterBlueprint;
+        partManager.masterBlueprint = masterBlueprint;
     }
 
     public List<Node> Descendents(List<int> ancestorIds)
@@ -367,6 +417,25 @@ public class Part_Generation: MonoBehaviour
             Debug.Log(socketPositions.Count);
         }*/
         #endregion
+
+        if(Input.GetKeyDown(KeyCode.K))
+        {
+            var blueprint = SubsetBlueprint(2);
+            foreach (Node node in blueprint)
+            {
+                Debug.Log("Parent shape =" + node.shape);
+                foreach (Node child in node.children)
+                {
+                    if (child == null)
+                    {
+                        Debug.Log("no child");
+                    } else
+                    {
+                        Debug.Log(child.shape);
+                    }
+                }
+            }
+        }
     }
 
     public List<Cell> CellCheck(Vector3Int initPos, int orientation)
@@ -402,7 +471,7 @@ public class Part_Generation: MonoBehaviour
 
     public void SetPart(Part part, int orientation, Vector3Int position)
     {
-        // Orientation is the orientation of the socket-generating part. 0 is down and incrementing moves the socket-part clockwise around initPos
+        // Orientation is the direction of the socket-generating part/ball joint. 0 is down and incrementing moves the socket-part clockwise around initPos 
         cellDict[position].occupyingPart = part;
         cellDict[position].occupyingPart.rotation = orientation;
         // The current maximum +1, since this will always be added on and we're never deleting anything. This is fragile. 
@@ -430,11 +499,16 @@ public class Part_Generation: MonoBehaviour
                 if(searchedCell.occupyingPart == null)
                 {
                     //sets socket's rotation to the inverse of the search's orientation
-                    Part socketInstance = socket;
-                    socketInstance.rotation = (i + 3) % 6;
+                    Part socketInstance = new Part { useIndex = 0 };
+                    socketInstance.rotation = (i + orientation + 3) % 6;
 
-                    searchedCell.occupyingPart = socketInstance;
+                    Debug.Log("orientation = " + (i + orientation + 3) % 6 + " position = " + searchedCell.position);
+
+                    cellDict[searchedCell.position].occupyingPart = socketInstance;
                     socketPositions.Add(searchedCell.position);
+
+                    Debug.Log("Position" + cellDict[searchedCell.position].position + " rotation = " + cellDict[searchedCell.position].occupyingPart.rotation + " useIndex = " + cellDict[searchedCell.position].occupyingPart.useIndex);
+
                 } else
                 {
                     Debug.Log("Adjacent Cell Status = " + searchedCell.occupyingPart.prefab);
@@ -447,8 +521,23 @@ public class Part_Generation: MonoBehaviour
         // requiredSpace being false shows this is a core part.
         if (!part.requiredSpace[0])
         {
-            Node currentNode = new Node();
-            currentNode.totalWeight = 0;
+            //This and the for loop sets the children array length to the number of children
+            int childrenNumber = 0;
+
+            for (int i = 0; i < part.requiredSpace.Length; i++)
+            {
+                if (part.requiredSpace[i])
+                {
+                    childrenNumber++;
+                }
+            }
+
+            Node currentNode = new Node
+            {
+                children = new Node[childrenNumber],
+                totalWeight = 0
+            };
+            
             masterBlueprint.Add(currentNode);
             // Add reference to the part with the script on it to this node later on. 
             // This reference will be used to assign an id to each part on when ids are assigned to nodes. 
@@ -459,20 +548,67 @@ public class Part_Generation: MonoBehaviour
             // This moves one cell in the opposite of the orientation and adds the Node at Cell.nodeIndex in masterBlueprint
             var parentNode = masterBlueprint[cellDict[position + adjCellTransforms[orientation]].nodeIndex];
 
+            //This and the for loop sets the children array length to the number of children
+            int childrenNumber = 0;
+
+            for (int i = 0; i < part.requiredSpace.Length; i++)
+            {
+                if (part.requiredSpace[i])
+                {
+                    childrenNumber++;
+                }
+            }
+
             Node currentNode = new Node
             {
-                parents = new List<Node> { parentNode },
+                parent = parentNode,
+                children = new Node[childrenNumber - 1],
                 totalWeight = parentNode.totalWeight + UnityEngine.Random.Range(part.weightMin, part.weightMax),
                 shape = part.shape,
-                color = UnityEngine.Random.Range(0, colorNumber)
+                color = UnityEngine.Random.Range(0, colorNumber),
+                flipped = part.flip
             };
 
             masterBlueprint.Add(currentNode);
 
             //this is supposed to add currentNode to the child list of the parent node.
-            masterBlueprint[cellDict[position + adjCellTransforms[orientation]].nodeIndex].children.Add(masterBlueprint[masterBlueprint.Count - 1]);
+            //parentNode.children.Add(masterBlueprint[masterBlueprint.Count - 1]);
+            if(parentNode.children.Length == 1)
+            {
+                parentNode.children[0] = masterBlueprint[masterBlueprint.Count - 1];
+            } else
+            {
+                //the long string gets the parent cell's part
+                var parentPart = cellDict[position + adjCellTransforms[orientation]].occupyingPart;
+                Debug.Log(position + adjCellTransforms[orientation]);
+                Debug.Log(position);
+                Debug.Log(adjCellTransforms[orientation]);
+                Debug.Log(orientation);
+                Debug.Log(parentPart.prefab);
+                //socket index is the slot this child part should fit into
+                var socketIndex = (orientation - parentPart.rotation + 3) % 6;
+                int socketBookmark = -1;
+                // Convert.ToInt32(part.requiredSpace[0] returns 1 if the parent isn't a core part.
+                for (int i = Convert.ToInt32(parentPart.requiredSpace[0]); i < parentPart.requiredSpace.Length; i++)
+                {
+                    int socketNumber = parentNode.children.Length;
+                    //socket bookmark stores (the index of) where the child should be put in the child array on the parent node
 
-            // Same thing as above with the part reference
+                    if(parentPart.requiredSpace[i])
+                    {
+                        socketBookmark++;
+                    }
+                    if(i == socketIndex)
+                    {
+                        parentNode.children[socketBookmark] = masterBlueprint[masterBlueprint.Count - 1];
+                    }
+                }
+            }
+
+            // Same thing as above with the part reference:
+            // Add reference to the part with the script on it to this node later on. 
+            // This reference will be used to assign an id to each part on when ids are assigned to nodes. 
+            // This reference will allow the part's script to access itself in the tree;  
         }
         #endregion
     }
@@ -505,20 +641,49 @@ public class Part_Generation: MonoBehaviour
         {
             if(item.id <= index)
             {
-                var itemContainer = item;
-                foreach (var child in itemContainer.children)
+                item.childrenValid = new bool[item.children.Length];
+                for (int i = 0; i < item.children.Length; i++)
                 {
-                    if (child.id <= index)
+                    if (item.children[i].id <= index)
                     {
-                        // removes children that are out of range from the nodes.
-                        itemContainer.children.Remove(child);
+                        // This true indicates that the index on the child here is not too high. It is false otherwise.
+                        item.childrenValid[i] = true;
                     }
                 }
                 // adds sanitised nodes to the return array
-                returnList.Add(itemContainer);
+                returnList.Add(item);
+
             }
         }
 
         return returnList;
+    }
+
+    public List<Node> BubbleSortID (List<Node> blueprint)
+    {
+        List<Node> retList = blueprint;
+        Node t;
+
+        for (int i = 0; i <= retList.Count - 2; i++)
+        {
+            for (int j = 0; j <= retList.Count - 2; j++)
+            {
+                if (retList[j].totalWeight > retList[j + 1].totalWeight)
+                {
+                    t = retList[j + 1];
+                    retList[j + 1] = retList[j];
+                    retList[j] = t;
+                }
+            }
+        }
+
+        for (int i = 0; i < retList.Count; i++)
+        {
+            retList[i].id = i;
+        }
+
+        //returning a reordered list breaks Cell.nodeIndex, which is used to reference the parent when adding new parts. 
+        //However, we don't need a more complex implementation yet since nodeIndex is never referenced post-generation and generation is only done once.
+        return retList;
     }
 }
