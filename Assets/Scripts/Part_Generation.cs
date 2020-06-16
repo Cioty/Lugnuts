@@ -149,34 +149,34 @@ public class Part_Generation: MonoBehaviour
         partLibrary = new Part[10]
         {
             //part 1                index 00
-            new Part {useIndex = 1, prefab = prefabPart01, flip = false, requiredSpace = new bool[6] {true, false, false, true, false, false}, weightMin = singleMin, weightMax = singleMax, shape = 1 },
+            new Part {useIndex = 1, prefab = prefabPart01, flip = false, requiredSpace = new bool[6] {true, false, false, true, false, false}, weightMin = singleMin, weightMax = singleMax, shape = Shape.prefabPart01 },
             //part 2 and flips      index 01, 02
-            new Part {useIndex = 1, prefab = prefabPart02, flip = false, requiredSpace = new bool[6] {true, false, true, false, false, false}, weightMin = singleMin, weightMax = singleMax, shape = 2 },
-            new Part {useIndex = 1, prefab = prefabPart02, flip = true, requiredSpace = new bool[6] {true, false, false, false, true, false}, weightMin = singleMin, weightMax = singleMax, shape = 2 },
+            new Part {useIndex = 1, prefab = prefabPart02, flip = false, requiredSpace = new bool[6] {true, false, true, false, false, false}, weightMin = singleMin, weightMax = singleMax, shape = Shape.prefabPart02 },
+            new Part {useIndex = 1, prefab = prefabPart02, flip = true, requiredSpace = new bool[6] {true, false, false, false, true, false}, weightMin = singleMin, weightMax = singleMax, shape = Shape.prefabPart02 },
             //part 3 and flips      index 03, 04
-            new Part {useIndex = 1, prefab = prefabPart03, flip = false, requiredSpace = new bool[6] {true, true, false, false, false, false}, weightMin = singleMin, weightMax = singleMax, shape = 3 },
-            new Part {useIndex = 1, prefab = prefabPart03, flip = true, requiredSpace = new bool[6] {true, false, false, false, false, true}, weightMin = singleMin, weightMax = singleMax, shape = 3 },
+            new Part {useIndex = 1, prefab = prefabPart03, flip = false, requiredSpace = new bool[6] {true, true, false, false, false, false}, weightMin = singleMin, weightMax = singleMax, shape = Shape.prefabPart03 },
+            new Part {useIndex = 1, prefab = prefabPart03, flip = true, requiredSpace = new bool[6] {true, false, false, false, false, true}, weightMin = singleMin, weightMax = singleMax, shape = Shape.prefabPart03 },
             //part 4 and flips      index 05, 06
-            new Part {useIndex = 1, prefab = prefabPart04, flip = false, requiredSpace = new bool[6] {true, false, true, true, false, false}, weightMin = doubleMin, weightMax = doubleMax, shape = 4 },
-            new Part {useIndex = 1, prefab = prefabPart04, flip = true, requiredSpace = new bool[6] {true, false, false, true, true, false}, weightMin = doubleMin, weightMax = doubleMax, shape = 4 },
+            new Part {useIndex = 1, prefab = prefabPart04, flip = false, requiredSpace = new bool[6] {true, false, true, true, false, false}, weightMin = doubleMin, weightMax = doubleMax, shape = Shape.prefabPart04 },
+            new Part {useIndex = 1, prefab = prefabPart04, flip = true, requiredSpace = new bool[6] {true, false, false, true, true, false}, weightMin = doubleMin, weightMax = doubleMax, shape = Shape.prefabPart04},
             //part 5 and flips      index 07, 08
-            new Part {useIndex = 1, prefab = prefabPart05, flip = false, requiredSpace = new bool[6] {true, false, true, false, false, true}, weightMin = doubleMin, weightMax = doubleMax, shape = 5 },
-            new Part {useIndex = 1, prefab = prefabPart05, flip = true, requiredSpace = new bool[6] {true, true, false, false, true, false}, weightMin = doubleMin, weightMax = doubleMax, shape = 5 },
-            //part 6                index 09
-            new Part {useIndex = 1, prefab = prefabPart06, flip = false, requiredSpace = new bool[6] {true, false, true, false, true, false}, weightMin = doubleMin, weightMax = doubleMax, shape = 6 }
+            new Part {useIndex = 1, prefab = prefabPart05, flip = false, requiredSpace = new bool[6] {true, false, true, false, false, true}, weightMin = doubleMin, weightMax = doubleMax, shape = Shape.prefabPart05 },
+            new Part {useIndex = 1, prefab = prefabPart05, flip = true, requiredSpace = new bool[6] {true, true, false, false, true, false}, weightMin = doubleMin, weightMax = doubleMax, shape = Shape.prefabPart05},
+            //part 6                index 09                                                                                                                                                                        
+            new Part {useIndex = 1, prefab = prefabPart06, flip = false, requiredSpace = new bool[6] {true, false, true, false, true, false}, weightMin = doubleMin, weightMax = doubleMax, shape = Shape.prefabPart06 }
         };
 
         endPartLibrary = new Part[1]
         {
             //endPart 1
-            new Part {useIndex = 1, prefab = prefabPart00, flip = false, requiredSpace = new bool[6] {true, false, false, false, false, false}, weightMin = capMin, weightMax = capMax }
+            new Part {useIndex = 1, prefab = prefabPart00, flip = false, requiredSpace = new bool[6] {true, false, false, false, false, false}, weightMin = capMin, weightMax = capMax, shape = Shape.prefabPart00 }
         };
 
         // note, requiredSpace[0] is true on parts but false on cores. This is used in SetPart to determine is a part is a core.
         coreLibrary = new Part[1]
         {
             //core 1.               index 00
-            new Part {useIndex = 1, prefab = prefabCore01, flip = false, requiredSpace = new bool[6] {false, true, true, false, true, true}, shape = 0}
+            new Part {useIndex = 1, prefab = prefabCore01, flip = false, requiredSpace = new bool[6] {false, true, true, false, true, true} }
         };
 
         prefabLibrary = new GameObject[7] { prefabPart00,
