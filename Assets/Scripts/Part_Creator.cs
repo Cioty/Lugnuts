@@ -121,13 +121,13 @@ public class Part_Creator : MonoBehaviour
 
     public void BuildRobot(List<Node> blueprint)
     {
-        Instantiate(blueprint[0].,buildLocation.position, 
-            Quaternion.EulerAngles(new Vector3
-            (
-                buildLocation.rotation.x,
-                buildLocation.rotation.y, 
-                buildLocation.rotation.z)
-            ),
-            buildLocation
+       // Instantiate(blueprint[0]., buildLocation.position,
+       //     Quaternion.Euler(new Vector3
+       //     (
+       //         buildLocation.rotation.x,
+       //         buildLocation.rotation.y,
+       //         buildLocation.rotation.z)
+       //     ),
+       //     buildLocation);
     }
 }

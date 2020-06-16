@@ -13,7 +13,7 @@ public class Part_Manager : MonoBehaviour
     [HideInInspector]
     public List<Node> playerBlueprint;
 
-    public void CompareBLueprints()
+    public void CompareBlueprints()
     {
 
     }
