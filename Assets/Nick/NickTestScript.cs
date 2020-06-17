@@ -55,6 +55,7 @@ public class NickTestScript : MonoBehaviour
             pieceRigidBody.isKinematic = true;
             //changes the position and rotation of the object to be the same distance/rotation each time
             this.gameObject.transform.position = myHand.transform.position;
+            
 
         }
         //drops the piece if it's being held, and it becomes subject to gravity
