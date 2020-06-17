@@ -36,7 +36,7 @@ public class NickTestScript : MonoBehaviour
     void Start()
     {
         //finds the piece's rigidbody
-        pieceRigidBody = this.gameObject.GetComponent<Rigidbody>();
+        pieceRigidBody = this.gameObject.GetComponentInChildren<Rigidbody>();
     }
 
 
@@ -48,20 +48,22 @@ public class NickTestScript : MonoBehaviour
         //if player is not holding piece and the piece is being looked at
         if (holdingPiece == false && this.gameObject.tag == "Respawn")
         {
-            this.gameObject.transform.rotation = new Quaternion(0, 0, 0, 0);
+            //this.transform.rotation = Vector3.Lerp (0, 0, 0);
+            pieceRigidBody.transform.rotation = new Quaternion(0, 0, 0, 0);
+
             //parents the hand to the object so that it follows where the player looks
-            pieceRigidBody.transform.parent = myHand.transform;
+            this.transform.parent = myHand.transform;
             holdingPiece = true;
             pieceRigidBody.isKinematic = true;
             //changes the position and rotation of the object to be the same distance/rotation each time
-            this.gameObject.transform.position = myHand.transform.position;
-            
+            this.transform.position = myHand.transform.position;
+            pieceRigidBody.transform.position = myHand.position;
 
         }
         //drops the piece if it's being held, and it becomes subject to gravity
         else if (holdingPiece == true)
         {
-            pieceRigidBody.transform.parent = null;
+            this.transform.parent = null;
             pieceRigidBody.isKinematic = false;
             holdingPiece = false;   
         }
@@ -74,13 +76,13 @@ public class NickTestScript : MonoBehaviour
     {
         //tag names need to be changed
         this.gameObject.tag = "Respawn";
-        this.gameObject.GetComponent<Renderer>().material.color = hoverMaterial.color;
+        this.gameObject.GetComponentInChildren<Renderer>().material.color = hoverMaterial.color;
     }
     //occurs when player stops looking at object
     public void DeActiveLook()
     {
         this.gameObject.tag = "Untagged";
-        this.gameObject.GetComponent<Renderer>().material.color = baseMaterial.color;
+        this.gameObject.GetComponentInChildren<Renderer>().material.color = baseMaterial.color;
 
     }
     

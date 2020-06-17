@@ -11,6 +11,9 @@ public class ArmChecker : MonoBehaviour
     //the position where other pieces move to
     public Transform connectionPosition;
 
+    //[HideInInspector]
+    public bool connected = false;
+
 
     // Start is called before the first frame update
     void Start()
@@ -22,7 +25,7 @@ public class ArmChecker : MonoBehaviour
     public void OnTriggerEnter(Collider other)
     {
         //Checks if the player is not holding the object and the tag of the entered collier
-        if (other.tag == "Finish" && parentScript.holdingPiece == false /*&& other.gameObject.GetComponent<NickTestScript>().connected == false*/)
+        if (other.tag == "Finish" && parentScript.holdingPiece == false && connected == false /*&& other.GetComponentInChildren<ArmChecker>().connected == true*/)
         {
             AddPiece(other.gameObject);
            // parentScript.connected = true;
