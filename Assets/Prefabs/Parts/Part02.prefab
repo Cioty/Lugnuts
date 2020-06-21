@@ -31,7 +31,7 @@ Transform:
   m_LocalScale: {x: 0.21152498, y: 0.21152498, z: 0.211525}
   m_Children: []
   m_Father: {fileID: 7912182013834505484}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &8747252218541926246
 MeshFilter:
@@ -40,7 +40,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2677035559816099417}
-  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 4629239133506770964, guid: a4ec0764341701042a2adf2c562a98f6, type: 3}
 --- !u!23 &4744733289627878233
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -59,7 +59,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1ac7f5614cd717e44a2d79a8df6b7353, type: 2}
+  - {fileID: 2100000, guid: d6a53580c4d77fe48beb1810222a669b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -103,6 +103,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7912182013834505484}
+  - component: {fileID: 6673604845600886384}
+  - component: {fileID: 1595124225566995673}
   m_Layer: 0
   m_Name: Part02
   m_TagString: Untagged
@@ -119,13 +121,50 @@ Transform:
   m_GameObject: {fileID: 8638169824665122386}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.904, y: 0.48, z: -2.66}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.56, y: 0.56, z: 0.56}
   m_Children:
-  - {fileID: 158295019925198751}
   - {fileID: 5796374899678496300}
+  - {fileID: 158295019925198751}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6673604845600886384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8638169824665122386}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e35dd4ba2929a34449b8a79f5a9ccd36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shape: 2
+  color: 2
+  flipped: 1
+  globalPartManager: {fileID: 0}
+  socketList: []
+--- !u!114 &1595124225566995673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8638169824665122386}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be7d5aaa72b0c4946b2c2f2d95ea53bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myHand: {fileID: 0}
+  player: {fileID: 0}
+  thisGameObject: {fileID: 0}
+  pieceRigidBody: {fileID: 0}
+  holdingPiece: 0
+  connected: 0
+  hoverMaterial: {fileID: 0}
+  baseMaterial: {fileID: 0}
 --- !u!1 &8989775981423790091
 GameObject:
   m_ObjectHideFlags: 0
@@ -135,6 +174,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 158295019925198751}
+  - component: {fileID: 400930289550829298}
+  - component: {fileID: 2843234489693477429}
   m_Layer: 0
   m_Name: Socket_01
   m_TagString: Socket
@@ -154,5 +195,32 @@ Transform:
   m_LocalScale: {x: 0.211525, y: 0.211525, z: 0.211525}
   m_Children: []
   m_Father: {fileID: 7912182013834505484}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 30.000002}
+--- !u!135 &400930289550829298
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8989775981423790091}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2843234489693477429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8989775981423790091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c0b6a106210c3b42988346fa0d2e78f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parentScript: {fileID: 0}
+  connectionPosition: {fileID: 0}

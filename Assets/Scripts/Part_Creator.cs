@@ -16,24 +16,76 @@ public class Part_Creator : MonoBehaviour
 
     public Transform buildLocation;
 
+    //Instantiate the demonstration doll here
+    public GameObject dollParent;
 
+    //Instantiate the core part here
+    public GameObject coreParent;
+    //Core vars
+    public GameObject[] coreLibrary;
 
     //create parts specific
     //part 1
     public float sizeMax = 800;
     public int prioritisedPartsNumber = 2;
-    
+
 
     //part 2
     public GameObject[] prefabLibrary;
-    public Mesh[] meshLibrary;
-    public Material[,] meshMaterialLibrary;
+    public Mesh[][] meshLibrary;
+    public Material[][] meshMaterialLibrary;
     public float heightOffset = 0;
     public GameObject partParent;
 
-    private void Start()
+    // Part prefab public variables
+    //public GameObject prefabPart00;
+    //public GameObject prefabPart01;
+    //public GameObject prefabPart02;
+    //public GameObject prefabPart03;
+    //public GameObject prefabPart04;
+    //public GameObject prefabPart05;
+    //public GameObject prefabPart06;
+    //
+    //Mesh variables //more to be added when artists have them
+    public Mesh[] part00Meshes;
+    public Mesh[] part01Meshes;
+    public Mesh[] part02Meshes;
+    public Mesh[] part03Meshes;
+    public Mesh[] part04Meshes;
+    public Mesh[] part05Meshes;
+    public Mesh[] part06Meshes;
+
+    //Material variables //more to be added when artists have them
+    public Material[] part00Mats;
+    public Material[] part01Mats;
+    public Material[] part02Mats;
+    public Material[] part03Mats;
+    public Material[] part04Mats;
+    public Material[] part05Mats;
+    public Material[] part06Mats;
+
+    private void Awake()
     {
-        
+        meshLibrary = new Mesh[7][];
+
+            meshLibrary[0] = part00Meshes;
+            meshLibrary[1] = part01Meshes;
+            meshLibrary[2] = part02Meshes;
+            meshLibrary[3] = part03Meshes;
+            meshLibrary[4] = part04Meshes;
+            meshLibrary[5] = part05Meshes;
+            meshLibrary[6] = part06Meshes;
+
+        meshMaterialLibrary = new Material[7][];
+
+            meshMaterialLibrary[0] = part00Mats;
+            meshMaterialLibrary[1] = part01Mats;
+            meshMaterialLibrary[2] = part02Mats;
+            meshMaterialLibrary[3] = part03Mats;
+            meshMaterialLibrary[4] = part04Mats;
+            meshMaterialLibrary[5] = part05Mats;
+            meshMaterialLibrary[6] = part06Mats;
+
     }
 
     //This spawns the parts for the crate
@@ -54,17 +106,17 @@ public class Part_Creator : MonoBehaviour
         for (int i = 0; i < prioritisedPartsNumber; i++)
         {
             //choose a random part and add it
-            var index = UnityEngine.Random.Range(0, prioritisedParts.Count);
-            toSpawn.Add(prioritisedParts[index]);
-            totalSize += prioritisedParts[index].size;
+            var index1 = UnityEngine.Random.Range(0, prioritisedParts.Count);
+            toSpawn.Add(prioritisedParts[index1]);
+            totalSize += prioritisedParts[index1].size;
 
             //Add children of the added part to prioritised parts
-            foreach (var newChild in Descendents(new List<Node>() { prioritisedParts[index] }))
+            foreach (var newChild in Descendents(new List<Node>() { prioritisedParts[index1] }))
             {
                 prioritisedParts.Add(newChild);
             }
 
-            prioritisedParts.RemoveAt(index);
+            prioritisedParts.RemoveAt(index1);
 
             if(prioritisedParts.Count == 0)
             {
@@ -74,8 +126,8 @@ public class Part_Creator : MonoBehaviour
 
         while (totalSize <= sizeMax)
         {
-            var index = UnityEngine.Random.Range(0, allowedParts.Count);
-            Node newNode = prioritisedParts[index];
+            var index2 = UnityEngine.Random.Range(0, allowedParts.Count);
+            Node newNode = allowedParts[index2];
             toSpawn.Add(newNode);
             totalSize += newNode.size;
         }
@@ -88,27 +140,15 @@ public class Part_Creator : MonoBehaviour
 
         foreach (var node in toSpawn)
         {
-            //Create the part to be instantiated
-            GameObject thisPart = prefabLibrary[(int)node.shape];
-            //transform.GetChild(0) SHOULD get the mesh object in each prefab
-            var thisPartMeshChild = thisPart.transform.GetChild(0);
-            thisPartMeshChild.GetComponent<MeshFilter>().mesh = meshLibrary[(int)node.shape]; //Set mesh filter
-            thisPartMeshChild.GetComponent<MeshRenderer>().material = meshMaterialLibrary[(int)node.shape, node.color]; //Set material relative to mesh
 
-            //set variables on Local_Part_Manager
-            var thisPartManager = thisPart.GetComponent<Local_Part_Manager>();
-
-            thisPartManager.shape = node.shape;
-            thisPartManager.color = node.color;
-            thisPartManager.flipped = node.flipped;
-
-            //node SHOULD come from the master blueprint. Descendents and FutureNodes both interface and get references from masterBlueprint.
-            thisPartManager.masterBlueprintReference = node;
-            thisPartManager.globalPartManager = partManager;
+            GameObject thisPart = SetPrefabAndScriptVars(node);
 
             //instantiate the part
-            Instantiate(thisPart, partParent.transform.position + new Vector3(0, spawnHeight, 0), Quaternion.identity, partParent.transform);
+            var thisClone = Instantiate(thisPart, partParent.transform.position + new Vector3(0, spawnHeight, 0), partParent.transform.rotation, partParent.transform);
             spawnHeight += 0.3f;
+
+            //transform.GetChild(0) SHOULD get the mesh object in each prefab
+            SetPartMeshAndMaterial(thisClone.transform.GetChild(0), node);
         }
 
         #endregion
@@ -122,13 +162,21 @@ public class Part_Creator : MonoBehaviour
     {
         //Set up lists
         CreateFutureNodes();
-        CreateAllowedParts();
         CreateEdgeList();
+        CreateAllowedParts();
 
-        //but a timer before this.
+        BuildRobot(partManager.subBlueprint);
+        //but a timer before this. Maybe trigger this after the doll has finished doing it's things?
         CreateParts();
+        InstantiateCore(coreParent);
+    }
 
-        //
+    public GameObject InstantiateCore(GameObject positionObject)
+    {
+        GameObject spawnObject = coreLibrary[masterBlueprint[0].shape - Shape.corePart00];
+
+        var returnObject = Instantiate(spawnObject, positionObject.transform.position, positionObject.transform.rotation, positionObject.transform);
+        return returnObject;
     }
 
     #region parameters for generation
@@ -149,10 +197,9 @@ public class Part_Creator : MonoBehaviour
         return returnList;
     }
 
-    
     public void CreateAllowedParts()
     {
-        allowedParts = new List<Node>() { masterBlueprint[0] };
+        allowedParts = new List<Node>();
         UpdateAllowedParts(new List<Node>() { masterBlueprint[0] });
     }
 
@@ -226,7 +273,6 @@ public class Part_Creator : MonoBehaviour
         }
     }
 
-
     public void CreateEdgeList()
     {
         edgeList = new List<Node> { masterBlueprint[0] };
@@ -285,15 +331,64 @@ public class Part_Creator : MonoBehaviour
         }
     }
 
+    public void SetPartMeshAndMaterial(Transform instance, Node dataNode)
+    {
+        instance.GetComponent<MeshFilter>().mesh = meshLibrary[(int)dataNode.shape][dataNode.color]; //Set mesh filter
+        instance.GetComponent<MeshRenderer>().material = meshMaterialLibrary[(int)dataNode.shape][dataNode.color]; //Set material relative to mesh
+    }
+
+    public GameObject SetPrefabAndScriptVars(Node node)
+    {
+        //Create the part to be instantiated
+        GameObject thisPart = prefabLibrary[(int)node.shape];
+
+        //set variables on Local_Part_Manager
+        var thisPartManager = thisPart.GetComponent<Local_Part_Manager>();
+
+        thisPartManager.color = node.color;
+        thisPartManager.shape = node.shape;
+        thisPartManager.flipped = node.flipped;
+
+        //node SHOULD come from the master blueprint. Descendents and FutureNodes both interface and get references from masterBlueprint.
+        thisPartManager.masterBlueprintReference = node;
+        thisPartManager.globalPartManager = partManager;
+
+        return thisPart;
+    }
+
     public void BuildRobot(List<Node> blueprint)
     {
-       // Instantiate(blueprint[0]., buildLocation.position,
-       //     Quaternion.Euler(new Vector3
-       //     (
-       //         buildLocation.rotation.x,
-       //         buildLocation.rotation.y,
-       //         buildLocation.rotation.z)
-       //     ),
-       //     buildLocation);
+        for (int i = 0; i < blueprint.Count; i++)
+        {
+            GameObject thisPart = SetPrefabAndScriptVars(blueprint[i]);
+            //this does the instantiating. The else covers non-core parts and makes sure they're instantiated on the right socket.
+            if(blueprint[i].id == 0)
+            {
+                var thisClone = InstantiateCore(dollParent);
+                blueprint[i].demonstrationObject = thisClone;
+            } else
+            {
+                int socketIndex = -1;
+
+                for (int j = 0; j < blueprint[i].parent.children.Length; j++)
+                {
+                    if(blueprint[i].parent.children[j] == blueprint[i])
+                    {
+                        socketIndex = j;
+                    }
+                }
+
+                // Sets parentSocket, the object that the new part will be instantiated as a child of, in an overly convoluted way.
+                GameObject parentSocket = blueprint[i].parent.demonstrationObject.GetComponent<Local_Part_Manager>().socketList[socketIndex];
+
+                var thisClone = Instantiate(thisPart, parentSocket.transform.position, parentSocket.transform.rotation, parentSocket.transform);
+                blueprint[i].demonstrationObject = thisClone;
+
+                SetPartMeshAndMaterial(thisClone.transform.GetChild(0), blueprint[i]);
+            }
+
+            
+
+        }
     }
 }

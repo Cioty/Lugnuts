@@ -10,9 +10,13 @@ public class Part_Manager : MonoBehaviour
     //variables from partGenScript
     [HideInInspector]
     public List<Node> masterBlueprint;
-    private List<Node> subBlueprint;
+    public List<Node> subBlueprint;
     [HideInInspector]
     public List<Node> playerBlueprint;
+
+    //follow me vars
+    private Queue<bool> followQueue;
+    private Queue<bool> followerQueue;
 
     //public class PseudoNode
     //{
@@ -29,7 +33,84 @@ public class Part_Manager : MonoBehaviour
 
     public void CompareBlueprints()
     {
+        //reset follow queues
+        followQueue     =   new Queue<bool>();
+        followerQueue   =   new Queue<bool>();
 
+        //get queues and follow queues
+        var subBlueprintQueue     = BFSTree(subBlueprint[0], followQueue);
+        var playerBlueprintQueue  = BFSTree(playerBlueprint[0], followerQueue);
+
+        //check follow queues are equal in length
+        if(followQueue.Count != followerQueue.Count)
+        {
+            CompareFailed();
+            return;
+        }
+
+        // check follow queues are equal in quality 
+        // This checks for socket-position inconsistencies in tree size
+        for (int i = 0; i < followQueue.Count; i++)
+        {
+            if(followQueue.Dequeue() != followerQueue.Dequeue())
+            {
+                CompareFailed();
+                return;
+            }
+        }
+
+        for (int i = 0; i < subBlueprint.Count; i++)
+        {
+            Node sub    = subBlueprintQueue.Dequeue();
+            Node player = playerBlueprintQueue.Dequeue();
+            if
+            (
+            player.shape == sub.shape &&
+            player.color == sub.color &&
+            player.flipped == sub.flipped
+            )
+            continue;
+            CompareFailed();
+        }
+    }
+
+    public void CompareFailed()
+    {
+
+    }
+
+    public void CompareSuccess()
+    {
+
+    }
+
+    private Queue<Node> BFSTree(Node inputNode, Queue<bool> followQueueIndex)
+    {
+        //Normal functions
+        Queue<Node> retQueue = new Queue<Node>();
+        retQueue.Enqueue(inputNode);
+
+        //follow me checks
+
+        // Children
+        for (int i = 0; i < inputNode.children.Length; i++)
+        {
+            if(inputNode.childrenValid[i] == true)
+            {
+                BFSTree(inputNode.children[i], followQueueIndex);
+                FollowLog(followQueueIndex, true);
+            } else
+            {
+                FollowLog(followQueueIndex, false);
+            }
+        }
+
+        return new Queue<Node>();
+    }
+
+    private void FollowLog(Queue<bool> toFollowQueue, bool data)
+    {
+        toFollowQueue.Enqueue(data);
     }
 
     public void CreatePlayerBlueprint()
@@ -73,9 +154,11 @@ public class Part_Manager : MonoBehaviour
                 if(flipped)
                 {
                     parentNode.children[parentSocketList.Count - i] = newNode;
+                    parentNode.childrenValid[i] = true;
                 } else
                 {
                     parentNode.children[i] = newNode;
+                    parentNode.childrenValid[i] = true;
                 }
             }
         }

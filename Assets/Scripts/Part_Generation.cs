@@ -54,7 +54,9 @@ public enum Shape
     prefabPart03,
     prefabPart04,
     prefabPart05,
-    prefabPart06
+    prefabPart06,
+    corePart00,
+    corePart01
 }
 
 public class Node
@@ -77,8 +79,7 @@ public class Node
     public float size;
 
     //This reference allows a script on the part to interact with the tree.
-    //never used afaik
-    //GameObject partObject;
+    public GameObject demonstrationObject;
 }
 
 public class Part_Generation: MonoBehaviour
@@ -100,16 +101,6 @@ public class Part_Generation: MonoBehaviour
     // Array holding all the end parts
     Part[] endPartLibrary;
 
-    // Part prefab public variables
-    public GameObject prefabPart00;
-    public GameObject prefabPart01;
-    public GameObject prefabPart02;
-    public GameObject prefabPart03;
-    public GameObject prefabPart04;
-    public GameObject prefabPart05;
-    public GameObject prefabPart06;
-    private GameObject[] prefabLibrary;
-
     //core part public variables
     public GameObject prefabCore01;
 
@@ -123,9 +114,6 @@ public class Part_Generation: MonoBehaviour
     Dictionary<Vector3Int, Cell> cellDict;
 
     private Vector3Int[] adjCellTransforms;
-
-    //Test Transform
-    public Transform centreTransform;
 
     public int gridRange = 2;
 
@@ -173,31 +161,17 @@ public class Part_Generation: MonoBehaviour
         endPartLibrary = new Part[1]
         {
             //endPart 1
-            new Part {useIndex = 1, flip = false, requiredSpace = new bool[6] {true, false, false, false, false, false}, weightMin = capMin, weightMax = capMax, shape = Shape.prefabPart00 }
+            new Part {useIndex = 1, flip = false, requiredSpace = new bool[6] {true, false, false, false, false, false}, weightMin = capMin, weightMax = capMax, shape = Shape.prefabPart00, size = 100 }
         };
 
         // note, requiredSpace[0] is true on parts but false on cores. This is used in SetPart to determine is a part is a core.
         coreLibrary = new Part[1]
         {
             //core 1.               index 00
-            new Part {useIndex = 1, flip = false, requiredSpace = new bool[6] {false, true, true, false, true, true} }
+            new Part {useIndex = 1, flip = false, requiredSpace = new bool[6] {false, true, true, false, true, true}, shape = Shape.corePart00 }
         };
-
-        prefabLibrary = new GameObject[7] 
-        {
-            prefabPart00,
-            prefabPart01,
-            prefabPart02,
-            prefabPart03,
-            prefabPart04,
-            prefabPart05,
-            prefabPart06
-        };
-
-
 
         socket = new Part { useIndex = 0 };
-        Debug.Log("Socket rotation = " + socket.rotation);
         blocked = new Part { useIndex = 2 };
 
         #endregion
@@ -282,20 +256,20 @@ public class Part_Generation: MonoBehaviour
             //    Debug.Log(part.prefab);
             //}
 
-            Debug.Log("Socket rotation = " + socket.rotation);
-            foreach (Vector3Int position in socketPositions)
-            {
-                Debug.Log("rotation = " + cellDict[position].occupyingPart.rotation + ", useIndex = " + cellDict[position].occupyingPart.useIndex);
-            }
+            //Debug.Log("Socket rotation = " + socket.rotation);
+            //foreach (Vector3Int position in socketPositions)
+            //{
+            //    Debug.Log("rotation = " + cellDict[position].occupyingPart.rotation + ", useIndex = " + cellDict[position].occupyingPart.useIndex);
+            //}
             var randomPositionTest = new Vector3Int(0, 1, -1);
-            if (cellDict[randomPositionTest].occupyingPart == null)
-            {
-                Debug.Log(randomPositionTest + " is null");
-            } else
-            {
-                Debug.Log(randomPositionTest + " useIndex = " + cellDict[randomPositionTest].occupyingPart.useIndex + ", rotation = " + cellDict[randomPositionTest].occupyingPart.rotation);
-            }
-            Debug.Log("Socket rotation = " + socket.rotation);
+            //if (cellDict[randomPositionTest].occupyingPart == null)
+            //{
+            //    Debug.Log(randomPositionTest + " is null");
+            //} else
+            //{
+            //    Debug.Log(randomPositionTest + " useIndex = " + cellDict[randomPositionTest].occupyingPart.useIndex + ", rotation = " + cellDict[randomPositionTest].occupyingPart.rotation);
+            //}
+            //Debug.Log("Socket rotation = " + socket.rotation);
 
             SetPart
                 (
@@ -313,6 +287,9 @@ public class Part_Generation: MonoBehaviour
 
         partCreator.masterBlueprint = masterBlueprint;
         partManager.masterBlueprint = masterBlueprint;
+
+        partManager.CreatePlayerBlueprint();
+        partCreator.NewModel();
     }
 
     public List<Node> Descendents(List<int> ancestorIds)
@@ -332,102 +309,7 @@ public class Part_Generation: MonoBehaviour
 
     private void Update()
     {
-        #region old generation code
-        /*
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-
-        
-            //this while loop does all the non-core part placement.
-            if (socketPositions.Count > 0)
-            {
-                //chooses a random socket from the socketPositions list
-                var randomSocket = UnityEngine.Random.Range(0, socketPositions.Count);
-
-                List<Cell> adjacentCells = CellCheck(socketPositions[randomSocket], cellDict[socketPositions[randomSocket]].occupyingPart.rotation);
-
-                List<Part> validPartChoices = new List<Part>();
-
-                foreach (var item in partLibrary)
-                {
-                    //i == 1 because you never have to check the centre hex since there should always be a socket there.
-                    for (int i = 1; i < adjacentCells.Count; i++)
-                    {
-                        //returns true if you can't add the part. You can't add it if occupyingPart isn't null when requiredSpace is true 
-                        if (adjacentCells[i].occupyingPart != null && item.requiredSpace[i])
-                        {    
-                            break;
-                        }
-
-                        if (i == adjacentCells.Count - 1)
-                        {
-                            validPartChoices.Add(item);
-                        }
-                    }
-                }
-
-                //This adds end-pieces seperately so we have more control
-                if (validPartChoices.Count == 0 || (socketPositions.Count > 2))
-                {
-                    //Adding only one endpart allows for variation in endParts to be added without making them more common in generation
-                    validPartChoices.Add(endPartLibrary[UnityEngine.Random.Range(0, endPartLibrary.Length)]);
-                }
-
-                //Debug.Log(validPartChoices.Count);
-                //foreach (Part part in validPartChoices)
-                //{
-                //    Debug.Log(part.prefab);
-                //}
-
-                SetPart
-                    (
-                        validPartChoices[UnityEngine.Random.Range(0,validPartChoices.Count)],
-                        cellDict[socketPositions[randomSocket]].occupyingPart.rotation,
-                        socketPositions[randomSocket]
-                    );
-
-                socketPositions.RemoveAt(randomSocket);
-                //choose part randomly from list, add part to graph, set weights based on part, add sockets.
-            } else
-            {
-                Debug.Log("No sockets left! SUCCESS");
-            }
-         }   
-
-        
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            for (int i = -gridRange; i <= gridRange; i++)
-            {
-                for (int j = -gridRange; j <= gridRange; j++)
-                {
-                    //Debug.Log($"{i}, {j}, {-i - j}");
-
-                    //without this check we generate a skewed grid that lets z be double gridRange
-                    if (Mathf.Abs(-i - j) <= gridRange)
-                    {
-                        if (cellDict[new Vector3Int(i, j, -i - j)].occupyingPart != null)
-                        {
-                            if (cellDict[new Vector3Int(i, j, -i - j)].occupyingPart.useIndex == 1) {
-                                Debug.Log(cellDict[new Vector3Int(i, j, -i - j)].position);
-                                Debug.Log(cellDict[new Vector3Int(i, j, -i - j)].occupyingPart.prefab);
-                                //Debug.Log(cellDict[new Vector3Int(i, j, -i - j)].occupyingPart.rotation);
-                            }
-                            
-                        }
-                    }
-
-                }
-            }
-        }
-        
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            Debug.Log(socketPositions.Count);
-        }*/
-        #endregion
-
-        if(Input.GetKeyDown(KeyCode.K))
+        /*if(Input.GetKeyDown(KeyCode.K))
         {
             var blueprint = SubsetBlueprint(2);
             foreach (Node node in blueprint)
@@ -444,7 +326,7 @@ public class Part_Generation: MonoBehaviour
                     }
                 }
             }
-        }
+        }*/
     }
 
     public List<Cell> CellCheck(Vector3Int initPos, int orientation)
@@ -486,13 +368,6 @@ public class Part_Generation: MonoBehaviour
         // The current maximum +1, since this will always be added on and we're never deleting anything. This is fragile. 
         cellDict[position].nodeIndex = masterBlueprint.Count;
 
-        //Test instantiation of part
-        /* var s = 0.25f;
-        float xValue = Mathf.Sqrt(3f) * s * (position.y / 2f + position.x);
-        float yValue = 3f / 2f * s * position.y;
-        Instantiate(part.prefab, new Vector3(centreTransform.position.x + xValue, centreTransform.position.y + yValue, centreTransform.position.z), Quaternion.Euler(0,0,0), centreTransform);
-        */
-
         #region set sockets
         // array of positions for the search. Taken from CellTransform
         List<Cell> rotarySearch = GetAdj(position);
@@ -511,12 +386,12 @@ public class Part_Generation: MonoBehaviour
                     Part socketInstance = new Part { useIndex = 0 };
                     socketInstance.rotation = (i + orientation + 3) % 6;
 
-                    Debug.Log("orientation = " + (i + orientation + 3) % 6 + " position = " + searchedCell.position);
+                    //Debug.Log("orientation = " + (i + orientation + 3) % 6 + " position = " + searchedCell.position);
 
                     cellDict[searchedCell.position].occupyingPart = socketInstance;
                     socketPositions.Add(searchedCell.position);
 
-                    Debug.Log("Position" + cellDict[searchedCell.position].position + " rotation = " + cellDict[searchedCell.position].occupyingPart.rotation + " useIndex = " + cellDict[searchedCell.position].occupyingPart.useIndex);
+                    //Debug.Log("Position" + cellDict[searchedCell.position].position + " rotation = " + cellDict[searchedCell.position].occupyingPart.rotation + " useIndex = " + cellDict[searchedCell.position].occupyingPart.useIndex);
 
                 }
             }
