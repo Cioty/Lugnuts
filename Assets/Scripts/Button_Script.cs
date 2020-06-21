@@ -22,7 +22,10 @@ public class Button_Script : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(Input.GetKeyDown(KeyCode.H))
+        {
+            ButtonPress();
+        }
     }
 
     public void ButtonPress()

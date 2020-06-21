@@ -7,9 +7,7 @@ public class Local_Part_Manager : MonoBehaviour
     //This sits on the parent obejct in every part prefab.
 
     // Part properties
-    [HideInInspector]
     public Shape shape;
-    [HideInInspector]
     public int color;
     [HideInInspector]
     public bool flipped;
