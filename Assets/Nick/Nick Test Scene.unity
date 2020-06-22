@@ -2411,13 +2411,13 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: Connection
     clip: {fileID: 8300000, guid: 6ed93500d2031a540b1c3ac23d545965, type: 3}
-    volume: 0
+    volume: 0.198
     loop: 0
     randomizePitch: 0
     source: {fileID: 0}
-  - name: 
-    clip: {fileID: 0}
-    volume: 0
+  - name: Disconnect
+    clip: {fileID: 8300000, guid: 6ef64a0fb6288ae4196affa6d008a37b, type: 3}
+    volume: 0.2
     loop: 0
     randomizePitch: 0
     source: {fileID: 0}
