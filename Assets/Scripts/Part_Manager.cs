@@ -18,17 +18,8 @@ public class Part_Manager : MonoBehaviour
     private Queue<bool> followQueue;
     private Queue<bool> followerQueue;
 
-    //public class PseudoNode
-    //{
-    //    public PseudoNode[] children;
-    //    public PseudoNode parent;
-    //
-    //    //shape is the number at the end of prefabPart
-    //    public Shape shape;
-    //    //color is currently arbitrary
-    //    public int color;
-    //    public bool flipped;
-    //}
+    //DollDemonstration Values
+    public float demoWaitTime = 1; //time in seconds between GlowFade starting on one part and it activating on the next one.
 
 
     public void CompareBlueprints()
@@ -111,6 +102,15 @@ public class Part_Manager : MonoBehaviour
     private void FollowLog(Queue<bool> toFollowQueue, bool data)
     {
         toFollowQueue.Enqueue(data);
+    }
+
+    public IEnumerator DollDemonstration()
+    {
+        for (int i = 0; i < subBlueprint.Count; i++)
+        {
+            StartCoroutine(subBlueprint[i].demonstrationObject.GetComponent<Local_Part_Manager>().GlowFade());
+            yield return new WaitForSeconds(demoWaitTime); 
+        }
     }
 
     public void CreatePlayerBlueprint()
