@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 245652181714886796}
   m_LocalRotation: {x: -0, y: -0, z: -0.49999952, w: 0.86602575}
   m_LocalPosition: {x: 0.21152493, y: 0.11637211, z: 0}
-  m_LocalScale: {x: 0.211525, y: 0.211525, z: 0.211525}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6554505243720767618}
   m_RootOrder: 3
@@ -43,7 +43,7 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.59
+  m_Radius: 0.13
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &620264983875825789
 MonoBehaviour:
@@ -59,6 +59,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parentScript: {fileID: 0}
   connectionPosition: {fileID: 0}
+  connected: 0
 --- !u!1 &611286961934782565
 GameObject:
   m_ObjectHideFlags: 0
@@ -86,7 +87,7 @@ Transform:
   m_GameObject: {fileID: 611286961934782565}
   m_LocalRotation: {x: -0, y: -0, z: -0.8660243, w: 0.50000197}
   m_LocalPosition: {x: 0.2500215, y: -0.10564993, z: 0}
-  m_LocalScale: {x: 0.14435002, y: 0.14435002, z: 0.14435}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6554505243720767618}
   m_RootOrder: 4
@@ -102,7 +103,7 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.59
+  m_Radius: 0.13
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &5908133728298474626
 MonoBehaviour:
@@ -118,6 +119,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parentScript: {fileID: 0}
   connectionPosition: {fileID: 0}
+  connected: 0
 --- !u!1 &734457579036887069
 GameObject:
   m_ObjectHideFlags: 0
@@ -333,7 +335,7 @@ Transform:
   m_GameObject: {fileID: 2153134379395526133}
   m_LocalRotation: {x: -0, y: -0, z: 0.86602515, w: 0.5000005}
   m_LocalPosition: {x: -0.25002152, y: -0.10565001, z: 0}
-  m_LocalScale: {x: 0.14434996, y: 0.14434996, z: 0.14435}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6554505243720767618}
   m_RootOrder: 1
@@ -349,7 +351,7 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.59
+  m_Radius: 0.13
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &3077164308844108690
 MonoBehaviour:
@@ -365,6 +367,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parentScript: {fileID: 0}
   connectionPosition: {fileID: 0}
+  connected: 0
 --- !u!1 &4673331117126304732
 GameObject:
   m_ObjectHideFlags: 0
@@ -374,6 +377,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6554505243720767618}
+  - component: {fileID: 564337737637866300}
   m_Layer: 0
   m_Name: Core01
   m_TagString: Untagged
@@ -390,7 +394,7 @@ Transform:
   m_GameObject: {fileID: 4673331117126304732}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.25, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.56, y: 0.56, z: 0.56}
   m_Children:
   - {fileID: 7443091284424504226}
   - {fileID: 528724543563323192}
@@ -403,6 +407,32 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &564337737637866300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4673331117126304732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e35dd4ba2929a34449b8a79f5a9ccd36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shape: 0
+  color: 0
+  flipped: 0
+  globalPartManager: {fileID: 0}
+  socketList:
+  - {fileID: 2153134379395526133}
+  - {fileID: 5474664057462390149}
+  - {fileID: 245652181714886796}
+  - {fileID: 611286961934782565}
+  colorAttackTime: 0.2
+  colorSustainTime: 0.3
+  silhouetteAttackTime: 0.2
+  colorMeter: 0
+  shadowMeter: 0
 --- !u!1 &5474664057462390149
 GameObject:
   m_ObjectHideFlags: 0
@@ -430,7 +460,7 @@ Transform:
   m_GameObject: {fileID: 5474664057462390149}
   m_LocalRotation: {x: -0, y: -0, z: 0.49999958, w: 0.8660257}
   m_LocalPosition: {x: -0.21152505, y: 0.11637202, z: 0}
-  m_LocalScale: {x: 0.211525, y: 0.211525, z: 0.211525}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6554505243720767618}
   m_RootOrder: 2
@@ -446,7 +476,7 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.59
+  m_Radius: 0.13
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1690283490297394769
 MonoBehaviour:
@@ -462,6 +492,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parentScript: {fileID: 0}
   connectionPosition: {fileID: 0}
+  connected: 0
 --- !u!1 &6524624405314510558
 GameObject:
   m_ObjectHideFlags: 0

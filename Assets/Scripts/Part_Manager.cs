@@ -6,10 +6,12 @@ public class Part_Manager : MonoBehaviour
 {
     public Part_Generation partGenScript;
     public Part_Creator partCreator;
+    public Game_Manager gameManager;
 
     //variables from partGenScript
     [HideInInspector]
     public List<Node> masterBlueprint;
+    [HideInInspector]
     public List<Node> subBlueprint;
     [HideInInspector]
     public List<Node> playerBlueprint;
@@ -67,7 +69,7 @@ public class Part_Manager : MonoBehaviour
 
     public void CompareFailed()
     {
-
+        gameManager.Failure();
     }
 
     public void CompareSuccess()
@@ -116,6 +118,48 @@ public class Part_Manager : MonoBehaviour
     public void CreatePlayerBlueprint()
     {
         playerBlueprint = new List<Node>() { masterBlueprint[0] };
+    }
+
+    public void SubsetBlueprint(int index)
+    {
+        var nullCount = 0;
+        foreach (var item in masterBlueprint)
+        {
+            foreach (var child in item.children)
+            {
+                if(child == null)
+                {
+                    nullCount++;
+                }
+            }
+        }
+        Debug.Log($"{"nullcount ="} {nullCount} {", Blueprint count ="} {masterBlueprint.Count}");
+
+        List<Node> returnList = new List<Node>();
+        // gets all the nodes with an id at or below index
+        foreach (Node item in masterBlueprint)
+        {
+            if (item.id <= index)
+            {
+                item.childrenValid = new bool[item.children.Length];
+                for (int i = 0; i < item.children.Length; i++)
+                {
+                    if (item.children[i] != null)
+                    {
+                        if (item.children[i].id <= index)
+                        {
+                            // This true indicates that the index on the child here is not too high. It is false otherwise.
+                            item.childrenValid[i] = true;
+                        }
+                    }
+                } 
+                // adds sanitised nodes to the return array
+                returnList.Add(item);
+
+            }
+        }
+
+        subBlueprint = returnList;
     }
 
     public void AddPlayerPart(Shape passedShape, int passedColor, GameObject socketObject, GameObject newObject)

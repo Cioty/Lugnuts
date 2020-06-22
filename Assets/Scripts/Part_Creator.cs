@@ -14,7 +14,7 @@ public class Part_Creator : MonoBehaviour
     private int allowedPartsMaxExtra = 2;
     private List<Node> edgeList;
 
-    public Transform buildLocation;
+    //public Transform buildLocation;
 
     //Instantiate the demonstration doll here
     public GameObject dollParent;
@@ -28,7 +28,9 @@ public class Part_Creator : MonoBehaviour
     //part 1
     public float sizeMax = 800;
     public int prioritisedPartsNumber = 2;
-
+    
+    //error material for showing parents have null children
+    public Material errorMaterial;
 
     //part 2
     public GameObject[] prefabLibrary;
@@ -145,6 +147,12 @@ public class Part_Creator : MonoBehaviour
 
             //instantiate the part
             var thisClone = Instantiate(thisPart, partParent.transform.position + new Vector3(0, spawnHeight, 0), partParent.transform.rotation, partParent.transform);
+
+            if (node.flipped)
+            {
+                thisClone.transform.localScale = new Vector3(-thisClone.transform.localScale.x, thisClone.transform.localScale.y, thisClone.transform.localScale.z);
+            }
+
             spawnHeight += 0.3f;
 
             //transform.GetChild(0) SHOULD get the mesh object in each prefab
@@ -158,7 +166,7 @@ public class Part_Creator : MonoBehaviour
         //Door Opens
     }
 
-    public void NewModel()
+    public void NewLine()
     {
         //Set up lists
         CreateFutureNodes();
@@ -360,7 +368,7 @@ public class Part_Creator : MonoBehaviour
     {
         for (int i = 0; i < blueprint.Count; i++)
         {
-            GameObject thisPart = SetPrefabAndScriptVars(blueprint[i]);
+            
             //this does the instantiating. The else covers non-core parts and makes sure they're instantiated on the right socket.
             if(blueprint[i].id == 0)
             {
@@ -368,20 +376,49 @@ public class Part_Creator : MonoBehaviour
                 blueprint[i].demonstrationObject = thisClone;
             } else
             {
+                GameObject thisPart = SetPrefabAndScriptVars(blueprint[i]);
+
+                var rigidBody = thisPart.GetComponent<Rigidbody>();
+                rigidBody.useGravity = false;
+                rigidBody.isKinematic = true;
+
+                //socket stuff
                 int socketIndex = -1;
 
                 for (int j = 0; j < blueprint[i].parent.children.Length; j++)
                 {
-                    if(blueprint[i].parent.children[j] == blueprint[i])
+                    //the == null is there because I don't know why there are null children there in the first place yet.
+                    if (blueprint[i].parent.children[j] == null)
+                    {
+                        socketIndex = j;
+                        thisPart.transform.GetChild(0).GetComponent<Renderer>().material = errorMaterial;
+                    }
+                    if (blueprint[i].parent.children[j] == blueprint[i])
                     {
                         socketIndex = j;
                     }
                 }
 
+                if(socketIndex == -1)
+                {
+                    Debug.Log($"{blueprint[i].parent.children.Length}");  
+                    for (int j = 0; j < blueprint[i].parent.children.Length; j++)
+                    {
+                        Debug.Log($"{blueprint[i].parent.children[j] == null}");
+                    }   
+                }
+
                 // Sets parentSocket, the object that the new part will be instantiated as a child of, in an overly convoluted way.
+                //Debug.Log($"{"blueprint count and index = "} {blueprint.Count} {i} {"socket index = "} {socketIndex}");
                 GameObject parentSocket = blueprint[i].parent.demonstrationObject.GetComponent<Local_Part_Manager>().socketList[socketIndex];
 
-                var thisClone = Instantiate(thisPart, parentSocket.transform.position, parentSocket.transform.rotation, parentSocket.transform);
+                var thisClone = Instantiate(thisPart, parentSocket.transform.position, parentSocket.transform.rotation, dollParent.transform);
+
+                if (blueprint[i].flipped)
+                {
+                    thisClone.transform.localScale = new Vector3(-thisClone.transform.localScale.x, thisClone.transform.localScale.y, thisClone.transform.localScale.z);
+                }
+
                 blueprint[i].demonstrationObject = thisClone;
 
                 SetPartMeshAndMaterial(thisClone.transform.GetChild(0), blueprint[i]);

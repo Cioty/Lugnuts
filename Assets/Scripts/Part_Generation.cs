@@ -124,7 +124,7 @@ public class Part_Generation: MonoBehaviour
     public int colorNumber = 3;
     #endregion
 
-    private void Start()
+    private void Awake()
     {
 
         #region part Library definitions
@@ -171,13 +171,10 @@ public class Part_Generation: MonoBehaviour
             new Part {useIndex = 1, flip = false, requiredSpace = new bool[6] {false, true, true, false, true, true}, shape = Shape.corePart00 }
         };
 
-        socket = new Part { useIndex = 0 };
-        blocked = new Part { useIndex = 2 };
-
         #endregion
 
-        //Grid declaration
-        masterBlueprint = new List<Node>();
+        socket = new Part { useIndex = 0 };
+        blocked = new Part { useIndex = 2 };
 
         // adjCellTransforms definition. Used in the GetAdj() method.
         adjCellTransforms = new Vector3Int[6]
@@ -185,6 +182,12 @@ public class Part_Generation: MonoBehaviour
             new Vector3Int(0, -1, 1), new Vector3Int(-1, 0, 1), new Vector3Int(-1, 1, 0),
             new Vector3Int(0, 1, -1), new Vector3Int(1, 0, -1), new Vector3Int(1, -1, 0)
         };
+    }
+
+    public void GenerateMasterBlueprint()
+    {
+        //Grid declaration
+        masterBlueprint = new List<Node>();
 
         #region generate the grid
 
@@ -199,11 +202,11 @@ public class Part_Generation: MonoBehaviour
                 //Debug.Log($"{i}, {j}, {-i - j}");
 
                 //without this check we generate a skewed grid that lets z be double gridRange
-                if(Mathf.Abs(-i-j) <= gridRange)
+                if (Mathf.Abs(-i - j) <= gridRange)
                 {
                     cellDict.Add(new Vector3Int(i, j, -i - j), new Cell { position = new Vector3Int(i, j, -i - j) });
                 }
-                
+
             }
         }
         //need to block off inaccessible grid bits
@@ -250,27 +253,6 @@ public class Part_Generation: MonoBehaviour
                 validPartChoices.Add(endPartLibrary[UnityEngine.Random.Range(0, endPartLibrary.Length)]);
             }
 
-            //Debug.Log(validPartChoices.Count);
-            //foreach (Part part in validPartChoices)
-            //{
-            //    Debug.Log(part.prefab);
-            //}
-
-            //Debug.Log("Socket rotation = " + socket.rotation);
-            //foreach (Vector3Int position in socketPositions)
-            //{
-            //    Debug.Log("rotation = " + cellDict[position].occupyingPart.rotation + ", useIndex = " + cellDict[position].occupyingPart.useIndex);
-            //}
-            var randomPositionTest = new Vector3Int(0, 1, -1);
-            //if (cellDict[randomPositionTest].occupyingPart == null)
-            //{
-            //    Debug.Log(randomPositionTest + " is null");
-            //} else
-            //{
-            //    Debug.Log(randomPositionTest + " useIndex = " + cellDict[randomPositionTest].occupyingPart.useIndex + ", rotation = " + cellDict[randomPositionTest].occupyingPart.rotation);
-            //}
-            //Debug.Log("Socket rotation = " + socket.rotation);
-
             SetPart
                 (
                     validPartChoices[UnityEngine.Random.Range(0, validPartChoices.Count)],
@@ -287,9 +269,6 @@ public class Part_Generation: MonoBehaviour
 
         partCreator.masterBlueprint = masterBlueprint;
         partManager.masterBlueprint = masterBlueprint;
-
-        partManager.CreatePlayerBlueprint();
-        partCreator.NewModel();
     }
 
     public List<Node> Descendents(List<int> ancestorIds)
@@ -416,6 +395,7 @@ public class Part_Generation: MonoBehaviour
             Node currentNode = new Node
             {
                 children = new Node[childrenNumber],
+                shape = part.shape,
                 totalWeight = 0
             };
             
@@ -458,7 +438,11 @@ public class Part_Generation: MonoBehaviour
             if(parentNode.children.Length == 1)
             {
                 parentNode.children[0] = masterBlueprint[masterBlueprint.Count - 1];
-            } else
+            } else if(parentNode.children.Length == 0)
+            {
+                Debug.Log("parent children empty");
+            }
+            else 
             {
                 //the long string gets the parent cell's part
                 var parentPart = cellDict[position + adjCellTransforms[orientation]].occupyingPart;
@@ -475,9 +459,25 @@ public class Part_Generation: MonoBehaviour
                     {
                         socketBookmark++;
                     }
+                    if(socketBookmark == -1)
+                    {
+                        foreach (var item in parentPart.requiredSpace)
+                        {
+                            Debug.Log($"{"parent required space = "}{item}");
+                        }
+                    }
+
                     if(i == socketIndex)
                     {
-                        parentNode.children[socketBookmark] = masterBlueprint[masterBlueprint.Count - 1];
+                        if(parentNode.children[socketBookmark] == null)
+                        {
+                            parentNode.children[socketBookmark] = masterBlueprint[masterBlueprint.Count - 1];
+                        } else
+                        {
+                            Debug.Log($"{parentNode.children[socketBookmark]}");
+                        }
+
+                        //Debug.Log($"{parentNode.children.Length}, { socketBookmark}, { parentNode.shape}");
                     }
                 }
             }
