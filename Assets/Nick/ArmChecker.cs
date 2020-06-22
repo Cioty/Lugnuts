@@ -34,7 +34,7 @@ public class ArmChecker : MonoBehaviour
 
     public void OnTriggerExit(Collider other)
     {
-        if (other.tag == "Finish")
+        if (other.tag == "Finish" )
         {
             RemovePiece();
         }
@@ -56,7 +56,7 @@ public class ArmChecker : MonoBehaviour
     {
 
         parentScript.pieceRigidBody.useGravity = true;
-        Audio_Manager.Play("Disconnect");
+        //Audio_Manager.Play("Disconnect");
 
         // parentScript.connected = false;
         localManager.RemovePieceFromGlobalManager();
