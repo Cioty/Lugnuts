@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5887538418459323724
 Transform:
   m_ObjectHideFlags: 0
@@ -105,7 +105,7 @@ GameObject:
   - component: {fileID: 5433402090623607286}
   - component: {fileID: 412487329138275784}
   - component: {fileID: 66975684135415750}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Socket_01
   m_TagString: Socket
   m_Icon: {fileID: 6519382022992737161, guid: 0000000000000000d000000000000000, type: 0}
@@ -120,7 +120,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3861603251451100770}
   m_LocalRotation: {x: -0, y: -0, z: 0.5000001, w: 0.8660253}
-  m_LocalPosition: {x: -0.21152505, y: 0.36637202, z: 0}
+  m_LocalPosition: {x: -0.215, y: 0.372, z: 0}
   m_LocalScale: {x: 0.211525, y: 0.211525, z: 0.211525}
   m_Children: []
   m_Father: {fileID: 2637004419810581349}
@@ -153,6 +153,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parentScript: {fileID: 0}
   connectionPosition: {fileID: 0}
+  connected: 0
 --- !u!1 &4518732905338323003
 GameObject:
   m_ObjectHideFlags: 0
@@ -164,6 +165,7 @@ GameObject:
   - component: {fileID: 2637004419810581349}
   - component: {fileID: 6017724133333784666}
   - component: {fileID: 24678229438132459}
+  - component: {fileID: 2106997726067341271}
   m_Layer: 0
   m_Name: Part06
   m_TagString: Untagged
@@ -206,6 +208,11 @@ MonoBehaviour:
   flipped: 0
   globalPartManager: {fileID: 0}
   socketList: []
+  colorAttackTime: 0.2
+  colorSustainTime: 0.3
+  silhouetteAttackTime: 0.2
+  colorMeter: 0
+  shadowMeter: 0
 --- !u!114 &24678229438132459
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -226,6 +233,22 @@ MonoBehaviour:
   connected: 0
   hoverMaterial: {fileID: 0}
   baseMaterial: {fileID: 0}
+--- !u!54 &2106997726067341271
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4518732905338323003}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &7814747811283173424
 GameObject:
   m_ObjectHideFlags: 0
@@ -238,6 +261,7 @@ GameObject:
   - component: {fileID: 3472637733381771535}
   - component: {fileID: 616324488427697456}
   - component: {fileID: 8099328536423839017}
+  - component: {fileID: 792133988651488188}
   m_Layer: 0
   m_Name: Mesh
   m_TagString: Untagged
@@ -252,9 +276,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7814747811283173424}
-  m_LocalRotation: {x: -0, y: -0, z: 0.2588191, w: 0.9659258}
-  m_LocalPosition: {x: -0.10576254, y: 0.18318602, z: 0}
-  m_LocalScale: {x: 0.21152498, y: 0.21152498, z: 0.211525}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.288, y: 0.288, z: 0.288}
   m_Children: []
   m_Father: {fileID: 2637004419810581349}
   m_RootOrder: 0
@@ -266,7 +290,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7814747811283173424}
-  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 8241394631363766472, guid: 4f436e1c8d857b64db3f389c343c9f27, type: 3}
 --- !u!23 &616324488427697456
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -316,10 +340,23 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.5000001
-  m_Height: 2
+  m_Radius: 0.28
+  m_Height: 1.76
   m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+  m_Center: {x: 0, y: 0.6, z: 0}
+--- !u!65 &792133988651488188
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7814747811283173424}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.12, y: 0.35, z: 0.44}
+  m_Center: {x: 0, y: 1.11, z: 0}
 --- !u!1 &9009021271386809195
 GameObject:
   m_ObjectHideFlags: 0
@@ -331,7 +368,7 @@ GameObject:
   - component: {fileID: 285416477353491711}
   - component: {fileID: 7315261151997618684}
   - component: {fileID: 6563000385824583990}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Socket_02
   m_TagString: Socket
   m_Icon: {fileID: 6519382022992737161, guid: 0000000000000000d000000000000000, type: 0}
@@ -346,7 +383,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9009021271386809195}
   m_LocalRotation: {x: -0, y: -0, z: -0.49999997, w: 0.86602545}
-  m_LocalPosition: {x: 0.21152493, y: 0.3663721, z: 0}
+  m_LocalPosition: {x: 0.215, y: 0.372, z: 0}
   m_LocalScale: {x: 0.21152501, y: 0.21152501, z: 0.211525}
   m_Children: []
   m_Father: {fileID: 2637004419810581349}
@@ -379,3 +416,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parentScript: {fileID: 0}
   connectionPosition: {fileID: 0}
+  connected: 0
