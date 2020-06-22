@@ -47,14 +47,19 @@ public class ArmChecker : MonoBehaviour
         parentScript.pieceRigidBody.useGravity = false;
         parentScript.pieceRigidBody.rotation = socketObject.GetComponent<ArmChecker>().connectionPosition.transform.rotation;
         parentScript.pieceRigidBody.position = socketObject.GetComponent<ArmChecker>().connectionPosition.transform.position;
+        Audio_Manager.Play("Connection");
 
         localManager.AddPieceToGlobalManager(socketObject);
     }
 
     public void RemovePiece()
     {
+
         parentScript.pieceRigidBody.useGravity = true;
+        Audio_Manager.Play("Disconnect");
+
         // parentScript.connected = false;
         localManager.RemovePieceFromGlobalManager();
+
     }
 }

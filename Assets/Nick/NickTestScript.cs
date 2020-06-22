@@ -58,6 +58,7 @@ public class NickTestScript : MonoBehaviour
             //changes the position and rotation of the object to be the same distance/rotation each time
             this.transform.position = myHand.transform.position;
             pieceRigidBody.transform.position = myHand.position;
+            
 
         }
         //drops the piece if it's being held, and it becomes subject to gravity
