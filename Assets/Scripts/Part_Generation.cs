@@ -23,6 +23,9 @@ public class Part
     //  1 = part
     //  2 = blocked
     public int useIndex = -1;
+    
+    //Redoing the way we assign nodes to parent.children[]; Keeping the id on the sockets instead of reverse engineering it.
+    public int socketMarker = -1;
 
     // weight determines the id order. Generates a value for each part instance between min and max
     public float weightMin;
@@ -165,10 +168,12 @@ public class Part_Generation: MonoBehaviour
         };
 
         // note, requiredSpace[0] is true on parts but false on cores. This is used in SetPart to determine is a part is a core.
-        coreLibrary = new Part[1]
+        coreLibrary = new Part[2]
         {
-            //core 1.               index 00
-            new Part {useIndex = 1, flip = false, requiredSpace = new bool[6] {false, true, true, false, true, true}, shape = Shape.corePart00 }
+            //core 00.              index 00
+            new Part {useIndex = 1, flip = false, requiredSpace = new bool[6] {false, true, true, false, true, true},  shape = Shape.corePart00 },
+            //core 01.              index 01
+            new Part {useIndex = 1, flip = false, requiredSpace = new bool[6] {false, true, false, true, false, true}, shape = Shape.corePart01 }
         };
 
         #endregion
@@ -201,8 +206,9 @@ public class Part_Generation: MonoBehaviour
             {
                 //Debug.Log($"{i}, {j}, {-i - j}");
 
-                //without this check we generate a skewed grid that lets z be double gridRange
-                if (Mathf.Abs(-i - j) <= gridRange)
+                // without this first check we generate a skewed grid that lets z be double gridRange
+                // the second check removes three hexes at the bottom of the grid at a range of 3
+                if (Mathf.Abs(-i - j) <= gridRange) //&& (-j +(-i - j)) >= 5 //buggy
                 {
                     cellDict.Add(new Vector3Int(i, j, -i - j), new Cell { position = new Vector3Int(i, j, -i - j) });
                 }
@@ -341,6 +347,12 @@ public class Part_Generation: MonoBehaviour
 
     public void SetPart(Part part, int orientation, Vector3Int position)
     {
+        //this gets the socket's socketMarker before it's overwritten
+        int socketMarker = -2;
+        if (part.requiredSpace[0])
+        {
+            socketMarker = cellDict[position].occupyingPart.socketMarker;
+        }
         // Orientation is the direction of the socket-generating part/ball joint. 0 is down and incrementing moves the socket-part clockwise around initPos 
         cellDict[position].occupyingPart = part;
         cellDict[position].occupyingPart.rotation = orientation;
@@ -352,17 +364,23 @@ public class Part_Generation: MonoBehaviour
         List<Cell> rotarySearch = GetAdj(position);
 
         //Loop through all the adjacent positions. If the part is a core part (which has requiredSpace[0] = false), start at the orientation position.
+        int childNumber = -1;
         for (int i = (0 + Convert.ToInt32(part.requiredSpace[0])); i < 6; i++)
         {
+            
             if (part.requiredSpace[i])
             {
+                //increments the child
+                ++childNumber;
+
                 //stores the position gotten by rotary search
                 var searchedCell = rotarySearch[(i + orientation) % 6];
 
                 if(searchedCell.occupyingPart == null)
                 {
                     //sets socket's rotation to the inverse of the search's orientation
-                    Part socketInstance = new Part { useIndex = 0 };
+                    //Debug.Log(childNumber);
+                    Part socketInstance = new Part { useIndex = 0, socketMarker = childNumber };
                     socketInstance.rotation = (i + orientation + 3) % 6;
 
                     //Debug.Log("orientation = " + (i + orientation + 3) % 6 + " position = " + searchedCell.position);
@@ -434,12 +452,17 @@ public class Part_Generation: MonoBehaviour
             masterBlueprint.Add(currentNode);
 
             //this is supposed to add currentNode to the child list of the parent node.
-            //parentNode.children.Add(masterBlueprint[masterBlueprint.Count - 1]);
-            if(parentNode.children.Length == 1)
+
+            //Debug.Log($"{"socketMarker = "} {socketMarker}");
+            parentNode.children[socketMarker] = masterBlueprint[masterBlueprint.Count - 1];
+
+            #region defunct code that reverse engineered the child index this node should be at. Buggy.
+            /*if(parentNode.children.Length == 1)
             {
                 parentNode.children[0] = masterBlueprint[masterBlueprint.Count - 1];
             } else if(parentNode.children.Length == 0)
             {
+                //this is debug code remove later
                 Debug.Log("parent children empty");
             }
             else 
@@ -459,7 +482,7 @@ public class Part_Generation: MonoBehaviour
                     {
                         socketBookmark++;
                     }
-                    if(socketBookmark == -1)
+                    if(i == parentPart.requiredSpace.Length-1 && socketBookmark == -1)
                     {
                         foreach (var item in parentPart.requiredSpace)
                         {
@@ -480,7 +503,8 @@ public class Part_Generation: MonoBehaviour
                         //Debug.Log($"{parentNode.children.Length}, { socketBookmark}, { parentNode.shape}");
                     }
                 }
-            }
+            }*/
+            #endregion
 
             // Same thing as above with the part reference:
             // Add reference to the part with the script on it to this node later on. 

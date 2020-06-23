@@ -22,7 +22,11 @@ public class Part_Manager : MonoBehaviour
 
     //DollDemonstration Values
     public float demoWaitTime = 1; //time in seconds between GlowFade starting on one part and it activating on the next one.
-
+    [HideInInspector]
+    public Animator dollParentAnimator;
+    private int startedDemos = 0;
+    [HideInInspector]
+    public int finishedDemos = 0;
 
     public void CompareBlueprints()
     {
@@ -74,7 +78,7 @@ public class Part_Manager : MonoBehaviour
 
     public void CompareSuccess()
     {
-
+        gameManager.Success();
     }
 
     private Queue<Node> BFSTree(Node inputNode, Queue<bool> followQueueIndex)
@@ -108,11 +112,24 @@ public class Part_Manager : MonoBehaviour
 
     public IEnumerator DollDemonstration()
     {
-        for (int i = 0; i < subBlueprint.Count; i++)
+        startedDemos = 0;
+        finishedDemos = 0;
+
+        for (int i = 1; i < subBlueprint.Count; i++)
         {
             StartCoroutine(subBlueprint[i].demonstrationObject.GetComponent<Local_Part_Manager>().GlowFade());
+            startedDemos++;
             yield return new WaitForSeconds(demoWaitTime); 
         }
+
+        //this should pause until the coroutines on each part are done
+        while(startedDemos != finishedDemos)
+        {
+            yield return null;
+        }
+
+        dollParentAnimator.SetBool("Enter", false);
+        partCreator.NewLine2();
     }
 
     public void CreatePlayerBlueprint()
