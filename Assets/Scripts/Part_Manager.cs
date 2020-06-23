@@ -6,10 +6,12 @@ public class Part_Manager : MonoBehaviour
 {
     public Part_Generation partGenScript;
     public Part_Creator partCreator;
+    public Game_Manager gameManager;
 
     //variables from partGenScript
     [HideInInspector]
     public List<Node> masterBlueprint;
+    [HideInInspector]
     public List<Node> subBlueprint;
     [HideInInspector]
     public List<Node> playerBlueprint;
@@ -20,7 +22,11 @@ public class Part_Manager : MonoBehaviour
 
     //DollDemonstration Values
     public float demoWaitTime = 1; //time in seconds between GlowFade starting on one part and it activating on the next one.
-
+    [HideInInspector]
+    public Animator dollParentAnimator;
+    private int startedDemos = 0;
+    [HideInInspector]
+    public int finishedDemos = 0;
 
     public void CompareBlueprints()
     {
@@ -67,12 +73,12 @@ public class Part_Manager : MonoBehaviour
 
     public void CompareFailed()
     {
-
+        gameManager.Failure();
     }
 
     public void CompareSuccess()
     {
-
+        gameManager.Success();
     }
 
     private Queue<Node> BFSTree(Node inputNode, Queue<bool> followQueueIndex)
@@ -106,16 +112,71 @@ public class Part_Manager : MonoBehaviour
 
     public IEnumerator DollDemonstration()
     {
-        for (int i = 0; i < subBlueprint.Count; i++)
+        startedDemos = 0;
+        finishedDemos = 0;
+
+        for (int i = 1; i < subBlueprint.Count; i++)
         {
             StartCoroutine(subBlueprint[i].demonstrationObject.GetComponent<Local_Part_Manager>().GlowFade());
+            startedDemos++;
             yield return new WaitForSeconds(demoWaitTime); 
         }
+
+        //this should pause until the coroutines on each part are done
+        while(startedDemos != finishedDemos)
+        {
+            yield return null;
+        }
+
+        dollParentAnimator.SetBool("Enter", false);
+        partCreator.NewLine2();
     }
 
     public void CreatePlayerBlueprint()
     {
         playerBlueprint = new List<Node>() { masterBlueprint[0] };
+    }
+
+    public void SubsetBlueprint(int index)
+    {
+        var nullCount = 0;
+        foreach (var item in masterBlueprint)
+        {
+            foreach (var child in item.children)
+            {
+                if(child == null)
+                {
+                    nullCount++;
+                }
+            }
+        }
+        Debug.Log($"{"nullcount ="} {nullCount} {", Blueprint count ="} {masterBlueprint.Count}");
+
+        List<Node> returnList = new List<Node>();
+        // gets all the nodes with an id at or below index
+        foreach (Node item in masterBlueprint)
+        {
+            if (item.id <= index)
+            {
+                item.childrenValid = new bool[item.children.Length];
+                for (int i = 0; i < item.children.Length; i++)
+                {
+                    if (item.children[i] != null)
+                    {
+                        if (item.children[i].id <= index)
+                        {
+                            // This true indicates that the index on the child here is not too high. It is false otherwise.
+                            item.childrenValid[i] = true;
+                        }
+                    }
+                } 
+                // adds sanitised nodes to the return array
+                returnList.Add(item);
+
+            }
+        }
+
+        subBlueprint = returnList;
     }
 
     public void AddPlayerPart(Shape passedShape, int passedColor, GameObject socketObject, GameObject newObject)

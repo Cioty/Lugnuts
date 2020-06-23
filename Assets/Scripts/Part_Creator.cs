@@ -7,6 +7,7 @@ public class Part_Creator : MonoBehaviour
     [HideInInspector]
     public List<Node> masterBlueprint;
     public Part_Manager partManager;
+    public Game_Manager gameManager;
 
     public List<Node> futureNodes;
     public List<Node> allowedParts;
@@ -14,13 +15,15 @@ public class Part_Creator : MonoBehaviour
     private int allowedPartsMaxExtra = 2;
     private List<Node> edgeList;
 
-    public Transform buildLocation;
+    //public Transform buildLocation;
 
     //Instantiate the demonstration doll here
     public GameObject dollParent;
+    private Animator dollParentAnimator;
 
     //Instantiate the core part here
     public GameObject coreParent;
+    private Animator coreParentAnimator;
     //Core vars
     public GameObject[] coreLibrary;
 
@@ -28,7 +31,9 @@ public class Part_Creator : MonoBehaviour
     //part 1
     public float sizeMax = 800;
     public int prioritisedPartsNumber = 2;
-
+    
+    //error material for showing parents have null children
+    public Material errorMaterial;
 
     //part 2
     public GameObject[] prefabLibrary;
@@ -86,6 +91,12 @@ public class Part_Creator : MonoBehaviour
             meshMaterialLibrary[5] = part05Mats;
             meshMaterialLibrary[6] = part06Mats;
 
+        //Get the animator variables so we don't call GetComponent() every time
+        dollParentAnimator = dollParent.GetComponent<Animator>();
+        partManager.dollParentAnimator = dollParentAnimator;
+
+        coreParentAnimator = coreParent.GetComponent<Animator>();
+        gameManager.coreParentAnimator = coreParentAnimator;
     }
 
     //This spawns the parts for the crate
@@ -138,14 +149,26 @@ public class Part_Creator : MonoBehaviour
 
         float spawnHeight = 0;
 
+        Debug.Log($"{"toSpawn.Count = "} {toSpawn.Count}");
+
         foreach (var node in toSpawn)
         {
 
             GameObject thisPart = SetPrefabAndScriptVars(node);
 
+            var rigidBody = thisPart.GetComponent<Rigidbody>();
+            rigidBody.useGravity = true;
+            rigidBody.isKinematic = false;
+
             //instantiate the part
             var thisClone = Instantiate(thisPart, partParent.transform.position + new Vector3(0, spawnHeight, 0), partParent.transform.rotation, partParent.transform);
-            spawnHeight += 0.3f;
+
+            if (node.flipped)
+            {
+                thisClone.transform.localScale = new Vector3(-thisClone.transform.localScale.x, thisClone.transform.localScale.y, thisClone.transform.localScale.z);
+            }
+
+            spawnHeight += 0.4f;
 
             //transform.GetChild(0) SHOULD get the mesh object in each prefab
             SetPartMeshAndMaterial(thisClone.transform.GetChild(0), node);
@@ -158,7 +181,7 @@ public class Part_Creator : MonoBehaviour
         //Door Opens
     }
 
-    public void NewModel()
+    public void NewLine()
     {
         //Set up lists
         CreateFutureNodes();
@@ -166,9 +189,16 @@ public class Part_Creator : MonoBehaviour
         CreateAllowedParts();
 
         BuildRobot(partManager.subBlueprint);
-        //but a timer before this. Maybe trigger this after the doll has finished doing it's things?
+        dollParentAnimator.SetBool("Enter", true);
+       
+        //NewLine2 is triggered when the demo is over
+    }
+
+    public void NewLine2()
+    {
         CreateParts();
         InstantiateCore(coreParent);
+        coreParentAnimator.SetBool("Enter", true);
     }
 
     public GameObject InstantiateCore(GameObject positionObject)
@@ -176,6 +206,7 @@ public class Part_Creator : MonoBehaviour
         GameObject spawnObject = coreLibrary[masterBlueprint[0].shape - Shape.corePart00];
 
         var returnObject = Instantiate(spawnObject, positionObject.transform.position, positionObject.transform.rotation, positionObject.transform);
+        //returnObject.GetComponent<Local_Part_Manager>().Initalise();
         return returnObject;
     }
 
@@ -331,10 +362,19 @@ public class Part_Creator : MonoBehaviour
         }
     }
 
-    public void SetPartMeshAndMaterial(Transform instance, Node dataNode)
+    public void SetPartMeshAndMaterial(Transform instance, Node dataNode, bool thisPartError = false )
     {
-        instance.GetComponent<MeshFilter>().mesh = meshLibrary[(int)dataNode.shape][dataNode.color]; //Set mesh filter
-        instance.GetComponent<MeshRenderer>().material = meshMaterialLibrary[(int)dataNode.shape][dataNode.color]; //Set material relative to mesh
+        if (!thisPartError)
+        {
+            instance.GetComponent<MeshFilter>().mesh = meshLibrary[(int)dataNode.shape][dataNode.color]; //Set mesh filter
+            instance.GetComponent<MeshRenderer>().material = meshMaterialLibrary[(int)dataNode.shape][dataNode.color]; //Set material relative to mesh
+        }
+        else //this else is a debug thing that adds the error material if the parent's child is null.
+        {
+            instance.GetComponent<MeshFilter>().mesh = meshLibrary[(int)dataNode.shape][dataNode.color]; //Set mesh filter
+            instance.GetComponent<MeshRenderer>().material = errorMaterial;
+        }
+        instance.parent.GetComponent<Local_Part_Manager>().Initalise();
     }
 
     public GameObject SetPrefabAndScriptVars(Node node)
@@ -360,7 +400,7 @@ public class Part_Creator : MonoBehaviour
     {
         for (int i = 0; i < blueprint.Count; i++)
         {
-            GameObject thisPart = SetPrefabAndScriptVars(blueprint[i]);
+            
             //this does the instantiating. The else covers non-core parts and makes sure they're instantiated on the right socket.
             if(blueprint[i].id == 0)
             {
@@ -368,23 +408,110 @@ public class Part_Creator : MonoBehaviour
                 blueprint[i].demonstrationObject = thisClone;
             } else
             {
+                GameObject thisPart = SetPrefabAndScriptVars(blueprint[i]);
+
+                var rigidBody = thisPart.GetComponent<Rigidbody>();
+                rigidBody.useGravity = false;
+                rigidBody.isKinematic = true;
+                //this is used to apply an error texture after spawning if it's set to a null child. You can remove this after the bug is fixed.
+                bool thisPartError = false;
+
+                //socket stuff
                 int socketIndex = -1;
 
-                for (int j = 0; j < blueprint[i].parent.children.Length; j++)
+                if (!blueprint[i].parent.flipped)
                 {
-                    if(blueprint[i].parent.children[j] == blueprint[i])
+                    for (int j = 0; j < blueprint[i].parent.children.Length; j++)
                     {
-                        socketIndex = j;
+                        if (blueprint[i].parent.children[j] == blueprint[i])
+                        {
+                            socketIndex = j;
+                        }
+                    }
+                    //this is debug stuff. You can remove once this is fixed.
+                    if (socketIndex == -1)
+                    {
+                        for (int j = 0; j < blueprint[i].parent.children.Length; j++)
+                        {
+                            //if the socket index is zero, this sets it to the null value.
+                            if (blueprint[i].parent.children[j] == null)
+                            {
+                                socketIndex = j;
+                                thisPartError = true;
+                            }
+                            //debug.logs
+                            if (blueprint[i].parent.children[j] != null)
+                            {
+                                Debug.Log($"{"non-flipped"} {blueprint[i].parent.children[j].shape}");
+                            } else
+                            {
+                                Debug.Log($"{"non-flipped"} {"null"}");
+                            }
+                        }
+                        
+                    }
+                } else
+                {
+                    for (int j = 0; j < blueprint[i].parent.children.Length; j++)
+                    {
+                        if (blueprint[i].parent.children[j] == blueprint[i])
+                        {
+                            socketIndex = blueprint[i].parent.children.Length-1-j;
+                        }
+                    }
+                    //this is debug stuff. You can remove once this is fixed.
+                    if (socketIndex == -1)
+                    {
+                        for (int j = 0; j < blueprint[i].parent.children.Length; j++)
+                        {
+                            //if the socket index is zero, this sets it to the null value.
+                            if (blueprint[i].parent.children[j] == null)
+                            {
+                                socketIndex = blueprint[i].parent.children.Length - 1 - j;
+                                thisPartError = true;
+                            }
+                            //debug.logs
+                            if (blueprint[i].parent.children[j] != null)
+                            {
+                                Debug.Log($"{"flipped"} {blueprint[i].parent.children[j].shape}");
+                            }
+                            else
+                            {
+                                Debug.Log($"{"flipped"} {"null"}");
+                            }
+                        }
+
                     }
                 }
 
+                //if(socketIndex == -1)
+                //{
+                //    Debug.Log($"{blueprint[i].parent.children.Length}");  
+                //    for (int j = 0; j < blueprint[i].parent.children.Length; j++)
+                //    {
+                //        Debug.Log($"{blueprint[i].parent.children[j] == null}");
+                //    }   
+                //}
+
+                if(blueprint[i].parent.demonstrationObject.GetComponent<Local_Part_Manager>().socketList.Count == socketIndex)
+                {
+                    Debug.Log($"{"parent flipped = "}{blueprint[i].parent.flipped}"); 
+                }
+
                 // Sets parentSocket, the object that the new part will be instantiated as a child of, in an overly convoluted way.
+                //Debug.Log($"{"socketlist count and index = "} {blueprint[i].parent.demonstrationObject.GetComponent<Local_Part_Manager>().socketList.Count} {"socket index = "} {socketIndex}");
                 GameObject parentSocket = blueprint[i].parent.demonstrationObject.GetComponent<Local_Part_Manager>().socketList[socketIndex];
 
-                var thisClone = Instantiate(thisPart, parentSocket.transform.position, parentSocket.transform.rotation, parentSocket.transform);
+                var thisClone = Instantiate(thisPart, parentSocket.transform.position, parentSocket.transform.rotation, dollParent.transform);
+
+                if (blueprint[i].flipped)
+                {
+                    thisClone.transform.localScale = new Vector3(-thisClone.transform.localScale.x, thisClone.transform.localScale.y, thisClone.transform.localScale.z);
+                }
+
                 blueprint[i].demonstrationObject = thisClone;
 
-                SetPartMeshAndMaterial(thisClone.transform.GetChild(0), blueprint[i]);
+                SetPartMeshAndMaterial(thisClone.transform.GetChild(0), blueprint[i], thisPartError);
             }
 
             
