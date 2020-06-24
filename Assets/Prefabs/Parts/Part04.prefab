@@ -50,7 +50,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shape: 4
-  color: 0
+  color: 1
   flipped: 1
   globalPartManager: {fileID: 0}
   socketLaser: {fileID: 0}

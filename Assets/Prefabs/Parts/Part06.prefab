@@ -205,7 +205,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shape: 6
-  color: 0
+  color: 1
   flipped: 0
   globalPartManager: {fileID: 0}
   socketLaser: {fileID: 0}

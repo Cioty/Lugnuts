@@ -312,7 +312,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shape: 5
   color: 0
-  flipped: 1
+  flipped: 0
   globalPartManager: {fileID: 0}
   socketLaser: {fileID: 0}
   socketList:
