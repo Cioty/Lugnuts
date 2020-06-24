@@ -189,11 +189,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shape: 2
   color: 1
-  flipped: 1
+  flipped: 0
+  masterBlueprintReference:
+    children:
+    - children:
+      - children: []
+        childrenValid: 
+        totalWeight: 90
+        id: 9
+        shape: 0
+        color: 1
+        flipped: 0
+        size: 100
+        demonstrationObject: {fileID: 0}
+      childrenValid: 
+      totalWeight: 60
+      id: 4
+      shape: 3
+      color: 0
+      flipped: 0
+      size: 100
+      demonstrationObject: {fileID: 0}
+    childrenValid: 00
+    totalWeight: 30
+    id: 1
+    shape: 2
+    color: 1
+    flipped: 0
+    size: 100
+    demonstrationObject: {fileID: 0}
   globalPartManager: {fileID: 0}
   socketLaser: {fileID: 0}
   socketList:
   - {fileID: 8989775981423790091}
+  socketOccupied: 
+  thisNode:
+    children: []
+    childrenValid: 
+    totalWeight: 0
+    id: 0
+    shape: 0
+    color: 0
+    flipped: 0
+    size: 0
+    demonstrationObject: {fileID: 0}
   colorAttackTime: 0.2
   colorSustainTime: 0.3
   silhouetteAttackTime: 0.2
@@ -282,7 +321,6 @@ GameObject:
   m_Component:
   - component: {fileID: 158295019925198751}
   - component: {fileID: 400930289550829298}
-  - component: {fileID: 2843234489693477429}
   m_Layer: 8
   m_Name: Socket_01
   m_TagString: Socket
@@ -318,21 +356,6 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.13
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &2843234489693477429
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8989775981423790091}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c0b6a106210c3b42988346fa0d2e78f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  parentScript: {fileID: 0}
-  connectionPosition: {fileID: 0}
-  connected: 0
 --- !u!1001 &1873492055265487415
 PrefabInstance:
   m_ObjectHideFlags: 0

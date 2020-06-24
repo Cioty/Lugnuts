@@ -62,6 +62,7 @@ public enum Shape
     corePart01
 }
 
+[System.Serializable]
 public class Node
 {
     public Node[] children;

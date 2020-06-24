@@ -205,6 +205,12 @@ public class Part_Creator : MonoBehaviour
     {
         GameObject spawnObject = coreLibrary[masterBlueprint[0].shape - Shape.corePart00];
 
+        // Vars
+        var thisPartManager = spawnObject.GetComponent<Local_Part_Manager>();
+
+        //shape is needed for partManager to tell that this is a core object
+        thisPartManager.shape = masterBlueprint[0].shape;
+
         var returnObject = Instantiate(spawnObject, positionObject.transform.position, positionObject.transform.rotation, positionObject.transform);
         //returnObject.GetComponent<Local_Part_Manager>().Initalise();
         return returnObject;
@@ -390,7 +396,9 @@ public class Part_Creator : MonoBehaviour
         thisPartManager.flipped = node.flipped;
 
         //node SHOULD come from the master blueprint. Descendents and FutureNodes both interface and get references from masterBlueprint.
-        thisPartManager.masterBlueprintReference = node;
+        //thisPartManager.masterBlueprintReference = node;
+        //this didn't work when I tried to set it normally.
+        thisPartManager.SetMasterBlueprintRef(node);
         thisPartManager.globalPartManager = partManager;
 
         return thisPart;

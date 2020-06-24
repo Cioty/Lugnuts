@@ -14,7 +14,6 @@ public class Local_Part_Manager : MonoBehaviour
     public int color;
     public bool flipped;
     //Transitioning Part_Creator to use references to the masterblueprint. This node is a reference to the part on the master blueprint that it's associated with.
-    [HideInInspector]
     public Node masterBlueprintReference;
     [HideInInspector]
     public Part_Manager globalPartManager;
@@ -23,6 +22,7 @@ public class Local_Part_Manager : MonoBehaviour
     private Local_Part_Manager thisScript;
 
     public List<GameObject> socketList;
+    public bool[] socketOccupied;
 
     //This gets set on part_manager and refers to the node that this part is associated with in playerBlueprint. Used to get a parent node from socketObject
     [HideInInspector]
@@ -53,6 +53,9 @@ public class Local_Part_Manager : MonoBehaviour
     private bool holdingPiece;
     private Transform origParent;
 
+    //stores true when this part is on the player's robot model
+    private bool onModel;
+
     #region matt's code
     public void Initalise()
     {
@@ -79,18 +82,34 @@ public class Local_Part_Manager : MonoBehaviour
         //grabs the parent when initalised, the part parent object.
         origParent = transform.parent;
 
+        //sets the length of socketOccupied
+        socketOccupied = new bool[socketList.Count];
+
         //turn off the socket colliders
         if(shape != Shape.corePart00 || shape != Shape.corePart01)
         {
             SocketToggle(false);
+        } else
+        {
+            masterBlueprintReference = globalPartManager.masterBlueprint[0];
         }
     }
 
-    private void SocketToggle(bool enable)
+    public void SetMasterBlueprintRef(Node masterNode)
+    {
+        Debug.Log("ran");
+        masterBlueprintReference = masterNode;
+        Debug.Log($"Master blueprint ref = {masterBlueprintReference.shape}");
+    }
+
+    private void SocketToggle(bool enable, GameObject specificSocket = null)
     {
         foreach (var socket in socketList)
         {
-            socket.GetComponent<Collider>().enabled = enable;
+            if (socket == specificSocket || specificSocket == null)
+            {
+                socket.GetComponent<Collider>().enabled = enable;
+            }
         }
     }
 
@@ -139,17 +158,23 @@ public class Local_Part_Manager : MonoBehaviour
     {
         //tree stuff
         globalPartManager.AddPlayerPart(shape, color, socketObject, gameObject);
-        //object stuff
-        transform.parent = coreParent.transform; 
+
         //socket stuff
         SocketToggle(true);
+        Audio_Manager.Play("Part_Connect");
+
+        //connect to object
+        AddToModel(socketLaser.previousCollider.gameObject);
     }
 
     public void RemovePieceFromGlobalManager()
     {
+        //tree stuff
         globalPartManager.RemovePlayerPart(gameObject);
         //socket stuff
         SocketToggle(false);
+        //this object stuff
+        RemoveFromModel();
     }
 
     public IEnumerator GlowFade()
@@ -198,10 +223,13 @@ public class Local_Part_Manager : MonoBehaviour
 
     private void Pickup()
     {
-        //this.transform.rotation = Vector3.Lerp (0, 0, 0);
-        //localRigidBody.transform.rotation = new Quaternion(0, 0, 0, 0);
+        if (onModel)
+        {
+            RemovePieceFromGlobalManager();
+        }
 
-        //parents the hand to the object so that it follows where the player looks
+
+        //parents the object to the hand so that it follows where the player looks
         transform.parent = myHand.transform;
         localRigidBody.isKinematic = true;
         holdingPiece = true;
@@ -220,37 +248,66 @@ public class Local_Part_Manager : MonoBehaviour
     {
         if (socketLaser.connected)
         {
+            //put on the model
+
+            //connect to tree
             AddPieceToGlobalManager(socketLaser.previousCollider.gameObject);
-            Audio_Manager.Play("Part_Connect");
+            
+        } else
+        {
+            //put on the ground
+
+            transform.parent = origParent;
+            localRigidBody.isKinematic = false;
+            //targetRotation = null is otherwise commented out
+            targetRotation = null;
+            localRigidBody.useGravity = true;
         }
 
-        transform.parent = origParent;
-        localRigidBody.isKinematic = false;
+        //universal changes
         holdingPiece = false;
-        //targetRotation = null is otherwise commented out
-        targetRotation = null;
         socketLaser.currentHeldScriptRef = null;
-        localRigidBody.useGravity = true;
 
         //shader deselect
         materialRef.SetFloat("frenSelect", 0);
     }
 
+    public void AddToModel(GameObject socket)
+    {
+        transform.parent = coreParent.transform;
+        targetPosition = socket.transform.position;
+        onModel = true;
+        localRigidBody.isKinematic = true;
+        localRigidBody.useGravity = false;
+
+        socket.transform.parent.gameObject.GetComponent<Local_Part_Manager>().SocketToggle(false, socket);
+
+    }
+    public void RemoveFromModel()
+    {
+        targetPosition = null;
+        targetRotation = null;
+        onModel = false;
+    }
+
     private void Update()
     {
-        if(holdingPiece == true)
+        if (targetPosition != null)
         {
-            if (targetPosition != null)
-            {
-                // The step size is equal to speed times frame time.
-                var step = moveSpeed * Time.deltaTime;
+            // The step size is equal to speed times frame time.
+            var step = moveSpeed * Time.deltaTime;
 
-                // Move our transform a step closer to the target's.
-                transform.position = Vector3.MoveTowards(transform.position, targetPosition.Value, step);
-            }
-                //var moveTowards = Vector3.MoveTowards(transform.position, targetPosition, maxReadjustSpeed);
-                //localRigidBody.velocity.Set(moveTowards.x, moveTowards.y, moveTowards.z);
-                //localRigidBody.MovePosition(moveTowards);
+            // Move our transform a step closer to the target's.
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition.Value, step);
+        }
+
+        if (holdingPiece || onModel)
+        {
+            Debug.Log(masterBlueprintReference);
+
+            //var moveTowards = Vector3.MoveTowards(transform.position, targetPosition, maxReadjustSpeed);
+            //localRigidBody.velocity.Set(moveTowards.x, moveTowards.y, moveTowards.z);
+            //localRigidBody.MovePosition(moveTowards);
             if (targetRotation != null)
             {
                 // The step size is equal to speed times frame time.

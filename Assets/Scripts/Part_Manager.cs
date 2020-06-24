@@ -134,7 +134,15 @@ public class Part_Manager : MonoBehaviour
 
     public void CreatePlayerBlueprint()
     {
-        playerBlueprint = new List<Node>() { masterBlueprint[0] };
+        playerBlueprint = new List<Node>();
+        playerBlueprint.Add(new Node
+        {
+            shape = masterBlueprint[0].shape,
+            color = masterBlueprint[0].color,
+            children = new Node[masterBlueprint[0].children.Length],
+            childrenValid = new bool[masterBlueprint[0].children.Length],
+            parent = null
+        });
     }
 
     public void SubsetBlueprint(int index)
@@ -186,7 +194,15 @@ public class Part_Manager : MonoBehaviour
         var parentObject = socketObject.transform.parent.gameObject;
         var parentObjectScript = parentObject.GetComponent<Local_Part_Manager>();
         var parentSocketList = parentObjectScript.socketList;
-        var parentNode = parentObjectScript.thisNode;
+        Node parentNode;
+        if (parentObjectScript.shape == Shape.corePart00 || parentObjectScript.shape == Shape.corePart01)
+        {
+            parentNode = playerBlueprint[0];
+        } else
+        {
+            parentNode = parentObjectScript.thisNode;
+        }
+        
         bool flipped = parentObjectScript.flipped;
 
         //newObject vars
@@ -198,6 +214,7 @@ public class Part_Manager : MonoBehaviour
             shape = passedShape,
             color = passedColor,
             children = new Node[newObjectScript.socketList.Count],
+            childrenValid = new bool[newObjectScript.socketList.Count],
             parent = parentNode
         };
 
@@ -214,8 +231,8 @@ public class Part_Manager : MonoBehaviour
             {
                 if(flipped)
                 {
-                    parentNode.children[parentSocketList.Count - i] = newNode;
-                    parentNode.childrenValid[i] = true;
+                    parentNode.children[parentSocketList.Count-1 - i] = newNode;
+                    parentNode.childrenValid[parentSocketList.Count - 1 - i] = true;
                 } else
                 {
                     parentNode.children[i] = newNode;

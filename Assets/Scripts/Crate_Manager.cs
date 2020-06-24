@@ -15,17 +15,21 @@ public class Crate_Manager : MonoBehaviour
     {
         crate1Animator = crate1.GetComponent<Animator>();
         crate2Animator = crate2.GetComponent<Animator>();
-        crateSet();
+        CrateSet();
     }
 
     private void CrateSet()
     {
         crate1Animator.SetBool("Entry", true);
+        crate1Bool = true;
         crate2Animator.SetBool("Entry", false);
     }
 
     public void CrateCycle()
     {
-        crate1Animator.Set
+        crate1Animator.SetBool("Entry", !crate1Bool);
+        crate1Bool = !crate1Bool;
+        crate2Animator.SetBool("Entry", !crate2Bool);
+        crate2Bool = !crate2Bool;
     }
 }

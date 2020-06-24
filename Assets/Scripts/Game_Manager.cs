@@ -9,6 +9,7 @@ public class Game_Manager : MonoBehaviour
     public Part_Generation partGeneration;
     public Part_Creator partCreator;
     public Socket_Laser socketLaser;
+    public Crate_Manager crateManager;
 
     //this gets incremented when you send off an incorrect model
     public int failureAmount = 0;
@@ -32,6 +33,7 @@ public class Game_Manager : MonoBehaviour
     public void Awake()
     {
         socketLaser.partManager = partManager;
+        crateManager = gameObject.GetComponent<Crate_Manager>();
     }
 
     public void Start()
@@ -67,6 +69,7 @@ public class Game_Manager : MonoBehaviour
         partManager.CreatePlayerBlueprint();
         NewModel();
         partCreator.NewLine();
+        
     }
 
     public void NewModel()

@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 9050197310409686808}
   - component: {fileID: 152455331802883741}
-  - component: {fileID: 620264983875825789}
   m_Layer: 8
   m_Name: Socket_03
   m_TagString: Socket
@@ -46,21 +45,6 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.13
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &620264983875825789
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 245652181714886796}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c0b6a106210c3b42988346fa0d2e78f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  parentScript: {fileID: 0}
-  connectionPosition: {fileID: 0}
-  connected: 0
 --- !u!1 &611286961934782565
 GameObject:
   m_ObjectHideFlags: 0
@@ -71,7 +55,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1512086649546037573}
   - component: {fileID: 2214933374722806727}
-  - component: {fileID: 5908133728298474626}
   m_Layer: 8
   m_Name: Socket_04
   m_TagString: Socket
@@ -107,21 +90,6 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.13
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &5908133728298474626
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 611286961934782565}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c0b6a106210c3b42988346fa0d2e78f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  parentScript: {fileID: 0}
-  connectionPosition: {fileID: 0}
-  connected: 0
 --- !u!1 &734457579036887069
 GameObject:
   m_ObjectHideFlags: 0
@@ -320,7 +288,6 @@ GameObject:
   m_Component:
   - component: {fileID: 528724543563323192}
   - component: {fileID: 4744616545045649830}
-  - component: {fileID: 3077164308844108690}
   m_Layer: 8
   m_Name: Socket_01
   m_TagString: Socket
@@ -356,21 +323,6 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.13
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3077164308844108690
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2153134379395526133}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c0b6a106210c3b42988346fa0d2e78f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  parentScript: {fileID: 0}
-  connectionPosition: {fileID: 0}
-  connected: 0
 --- !u!1 &4673331117126304732
 GameObject:
   m_ObjectHideFlags: 0
@@ -426,6 +378,7 @@ MonoBehaviour:
   color: 0
   flipped: 0
   globalPartManager: {fileID: 0}
+  socketLaser: {fileID: 0}
   socketList:
   - {fileID: 2153134379395526133}
   - {fileID: 5474664057462390149}
@@ -445,7 +398,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3821744290990957073}
   - component: {fileID: 4830852779324655189}
-  - component: {fileID: 1690283490297394769}
   m_Layer: 8
   m_Name: Socket_02
   m_TagString: Socket
@@ -481,21 +433,6 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.13
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1690283490297394769
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5474664057462390149}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c0b6a106210c3b42988346fa0d2e78f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  parentScript: {fileID: 0}
-  connectionPosition: {fileID: 0}
-  connected: 0
 --- !u!1 &6524624405314510558
 GameObject:
   m_ObjectHideFlags: 0
