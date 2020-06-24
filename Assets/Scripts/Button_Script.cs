@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using UnityEngine.Animations;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.VR;
@@ -10,7 +11,7 @@ public class Button_Script : MonoBehaviour
     public Animator chuteDoorAnimator;
     public Animator[] crateAnimators;
     public Animator crateConveyerAnimator;
-    private Animator thisAnimator;
+    public Animator thisAnimator;
     public bool buttonDone = true;
 
     // Start is called before the first frame update
@@ -22,19 +23,20 @@ public class Button_Script : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.H))
-        {
-            ButtonPress();
-        }
+        //if(Input.GetKeyDown(KeyCode.H))
+       // {
+       //     ButtonPress();
+       // } 
     }
 
     public void ButtonPress()
     {
         if (buttonDone) //how interact with apk
         {
-            thisAnimator.SetTrigger(0);
+            Audio_Manager.Play("Button");
+            thisAnimator.SetTrigger("Press");
             buttonDone = false;
-            partCreator.CreateParts();
+           partCreator.CreateParts();
         } //else play unsuccessful press sound
     }
 

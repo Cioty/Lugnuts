@@ -221,6 +221,7 @@ public class Local_Part_Manager : MonoBehaviour
         if (socketLaser.connected)
         {
             AddPieceToGlobalManager(socketLaser.previousCollider.gameObject);
+            Audio_Manager.Play("Part_Connect");
         }
 
         transform.parent = origParent;
