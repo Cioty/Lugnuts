@@ -17,4 +17,9 @@ public class Doll_Parent : MonoBehaviour
     {
         StartCoroutine(partManager.DollDemonstration());
     }
+
+    public void DestroyDoll()
+    {
+        partManager.DollRemove();
+    }
 }

@@ -8,6 +8,12 @@ public class Part_Manager : MonoBehaviour
     public Part_Creator partCreator;
     public Game_Manager gameManager;
 
+    //places parts can be
+    public GameObject partParent;
+    public GameObject myHand;
+    public GameObject coreParent;
+    public GameObject dollParent;
+
     //variables from partGenScript
     [HideInInspector]
     public List<Node> masterBlueprint;
@@ -69,6 +75,7 @@ public class Part_Manager : MonoBehaviour
             continue;
             CompareFailed();
         }
+        CompareSuccess();
     }
 
     public void CompareFailed()
@@ -94,7 +101,7 @@ public class Part_Manager : MonoBehaviour
         {
             if(inputNode.childrenValid[i] == true)
             {
-                BFSTree(inputNode.children[i], followQueueIndex);
+                retQueue.Enqueue(BFSTreeRecursion(inputNode.children[i], followQueueIndex));
                 FollowLog(followQueueIndex, true);
             } else
             {
@@ -102,7 +109,25 @@ public class Part_Manager : MonoBehaviour
             }
         }
 
-        return new Queue<Node>();
+        return retQueue;
+    }
+    private Node BFSTreeRecursion(Node inputNode, Queue<bool> followQueueIndex)
+    {
+        // Children
+        for (int i = 0; i < inputNode.children.Length; i++)
+        {
+            if (inputNode.childrenValid[i] == true)
+            {
+                BFSTreeRecursion(inputNode.children[i], followQueueIndex);
+                FollowLog(followQueueIndex, true);
+            }
+            else
+            {
+                FollowLog(followQueueIndex, false);
+            }
+        }
+
+        return inputNode;
     }
 
     private void FollowLog(Queue<bool> toFollowQueue, bool data)
@@ -129,7 +154,7 @@ public class Part_Manager : MonoBehaviour
         }
 
         dollParentAnimator.SetBool("Enter", false);
-        partCreator.NewLine2();
+        partCreator.NewModel3();
     }
 
     public void CreatePlayerBlueprint()
@@ -147,18 +172,18 @@ public class Part_Manager : MonoBehaviour
 
     public void SubsetBlueprint(int index)
     {
-        var nullCount = 0;
-        foreach (var item in masterBlueprint)
-        {
-            foreach (var child in item.children)
-            {
-                if(child == null)
-                {
-                    nullCount++;
-                }
-            }
-        }
-        Debug.Log($"{"nullcount ="} {nullCount} {", Blueprint count ="} {masterBlueprint.Count}");
+        //var nullCount = 0;
+        //foreach (var item in masterBlueprint)
+        //{
+        //    foreach (var child in item.children)
+        //    {
+        //        if(child == null)
+        //        {
+        //            nullCount++;
+        //        }
+        //    }
+        //}
+        //Debug.Log($"{"nullcount ="} {nullCount} {", Blueprint count ="} {masterBlueprint.Count}");
 
         List<Node> returnList = new List<Node>();
         // gets all the nodes with an id at or below index
@@ -248,7 +273,7 @@ public class Part_Manager : MonoBehaviour
             //partCreator.UpdateAllowedParts(new List<Node> { masterBlueprintReference });
 
         //edgeList takes in a node reference from playerBlueprint
-        partCreator.UpdateEdgeList(newNode, true);
+        partCreator.UpdateEdgeList(newNode, true); //is this consistent? - does it work more to the point.
         //futureNodes takes in a node reference from masterBlueprint
         partCreator.UpdateFutureNodes(newObjectScript.masterBlueprintReference, true);
 
@@ -268,23 +293,37 @@ public class Part_Manager : MonoBehaviour
         partCreator.UpdateFutureNodes(removedObjectScript.masterBlueprintReference, false);
 
         #endregion
+
+        //wow this really just doesn't exist huh.
     }
 
-    //private void EdgeListRecursiveRemove(Node searchNode)
-    //{
-    //    foreach (var child in searchNode.children)
-    //    {
-    //        if (child != null)
-    //        {
-    //            if (edgeList.Contains(child))
-    //            {
-    //                edgeList.Remove(child);
-    //            }
-    //            else
-    //            {
-    //                EdgeListRecursiveRemove(child);
-    //            }
-    //        }
-    //    }
-    //}
+    public void DollRemove()
+    {
+        DestroyPart(dollParent.transform);
+    }
+
+    public void NonCoreRemovePart()
+    {
+        DestroyPart(partParent.transform);
+        DestroyPart(myHand.transform);
+    }
+
+    public void PartRemove()
+    {
+        DestroyPart(partParent.transform);
+        DestroyPart(myHand.transform);
+        DestroyPart(coreParent.transform, false);
+    }
+
+    public void DestroyPart(Transform transform, bool edgeListRemove = false)
+    {
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            if (edgeListRemove)
+            {
+                partCreator.UpdateEdgeList(transform.GetComponent<Local_Part_Manager>().thisNode, false);
+            }
+            Destroy(transform.GetChild(i).gameObject);
+        }
+    }
 }

@@ -15,7 +15,17 @@ public class Part_Creator : MonoBehaviour
     private int allowedPartsMaxExtra = 2;
     private List<Node> edgeList;
 
-    //public Transform buildLocation;
+    //vars for the function that checks if the crate is settled and then passes a value to crateManager
+    //stores the last created object
+    private GameObject lastCreated;
+    private Rigidbody lastRigidBody;
+    private Crate_Manager crateManager;
+
+    private float settledSpeed = 0.1f;
+    private float settleTimerMax = 3f;
+    private float settleTimerMin = 0.4f;
+
+
 
     //Instantiate the demonstration doll here
     public GameObject dollParent;
@@ -97,6 +107,9 @@ public class Part_Creator : MonoBehaviour
 
         coreParentAnimator = coreParent.GetComponent<Animator>();
         gameManager.coreParentAnimator = coreParentAnimator;
+
+        //gets crateManager
+        crateManager = gameManager.crateManager;
     }
 
     //This spawns the parts for the crate
@@ -119,7 +132,21 @@ public class Part_Creator : MonoBehaviour
             //choose a random part and add it
             var index1 = UnityEngine.Random.Range(0, prioritisedParts.Count);
             toSpawn.Add(prioritisedParts[index1]);
-            totalSize += prioritisedParts[index1].size;
+
+            Debug.Log(prioritisedParts[index1]);
+            if(prioritisedParts[index1] != null)
+            {
+            Debug.Log(prioritisedParts[index1].size);
+            }
+            
+            if(prioritisedParts[index1] != null)
+            {
+                totalSize += prioritisedParts[index1].size;
+            } else
+            {
+                totalSize += 100;
+            }
+            
 
             //Add children of the added part to prioritised parts
             foreach (var newChild in Descendents(new List<Node>() { prioritisedParts[index1] }))
@@ -149,9 +176,38 @@ public class Part_Creator : MonoBehaviour
 
         float spawnHeight = 0;
 
-        Debug.Log($"{"toSpawn.Count = "} {toSpawn.Count}");
+        //Debug.Log($"toSpawn.Count = {toSpawn.Count}");
 
-        foreach (var node in toSpawn)
+        for (int i = 0; i < toSpawn.Count; i++)
+        {
+            GameObject thisPart = SetPrefabAndScriptVars(toSpawn[i]);
+
+            var rigidBody = thisPart.GetComponent<Rigidbody>();
+            rigidBody.useGravity = true;
+            rigidBody.isKinematic = false;
+
+            //instantiate the part
+            var thisClone = Instantiate(thisPart, partParent.transform.position + new Vector3(0, spawnHeight, 0), partParent.transform.rotation, partParent.transform);
+
+            if (toSpawn[i].flipped)
+            {
+                thisClone.transform.localScale = new Vector3(-thisClone.transform.localScale.x, thisClone.transform.localScale.y, thisClone.transform.localScale.z);
+            }
+
+            spawnHeight += 0.4f;
+
+            //transform.GetChild(0) SHOULD get the mesh object in each prefab
+            SetPartMeshAndMaterial(thisClone.transform.GetChild(0), toSpawn[i]);
+
+            if(i+1 >= toSpawn.Count)
+            {
+                lastCreated = thisClone;
+                StartCoroutine(CrateSettled());
+            };
+        }
+
+        #region foreach version of that code
+        /*foreach (var node in toSpawn)
         {
 
             GameObject thisPart = SetPrefabAndScriptVars(node);
@@ -172,13 +228,37 @@ public class Part_Creator : MonoBehaviour
 
             //transform.GetChild(0) SHOULD get the mesh object in each prefab
             SetPartMeshAndMaterial(thisClone.transform.GetChild(0), node);
-        }
-
+        }*/
         #endregion
 
-        //Timer
+        #endregion
+    }
 
-        //Door Opens
+    private IEnumerator CrateSettled()
+    {
+        lastRigidBody = lastCreated.GetComponent<Rigidbody>();
+        float settleTimer = 0f;
+
+        //waits until this is true before setting a value;
+        while(lastRigidBody.velocity.magnitude > settledSpeed || settleTimer < settleTimerMin)
+        {
+            //this is so the loop never goes on forever if settled speed is too low or the part falls out of the world.
+            settleTimer += Time.deltaTime;
+            if(settleTimer >= settleTimerMax)
+            {
+                //teleports the part to the spawn position so it at least has a chance to get in the crate
+                lastCreated.transform.position = partParent.transform.position;
+                //exits the loop
+                break;
+            }
+
+            //helps me adjust settled speed
+            //Debug.Log(lastRigidBody.velocity.magnitude);
+            
+            yield return null;
+        }
+        //this lets the crate move out.
+        crateManager.createPartsFinished = true;
     }
 
     public void NewLine()
@@ -188,13 +268,18 @@ public class Part_Creator : MonoBehaviour
         CreateEdgeList();
         CreateAllowedParts();
 
-        BuildRobot(partManager.subBlueprint);
-        dollParentAnimator.SetBool("Enter", true);
-       
-        //NewLine2 is triggered when the demo is over
+        NewModel2();
     }
 
-    public void NewLine2()
+    public void NewModel2()
+    {
+        BuildRobot(partManager.subBlueprint);
+        dollParentAnimator.SetBool("Enter", true);
+
+        //NewModel3 is triggered when the demo is over
+    }
+
+    public void NewModel3()
     {
         CreateParts();
         InstantiateCore(coreParent);
@@ -224,10 +309,28 @@ public class Part_Creator : MonoBehaviour
 
         foreach (var index in ancestorNodes)
         {
+            //debug code.
+            if(index == null)
+            {
+                Debug.Log("Index == null");
+            }
+            else
+            {
+                Debug.Log($"parentnode shape =  {index.shape}");
+            }
+
             // This foreach works because masterBlueprint is ordered by id. Therefore id = List index.
             foreach (var child in index.children)
             {
-                returnList.Add(child);
+                if (child != null)
+                {
+                    Debug.Log($"correctChild {child.shape}");
+                    returnList.Add(child);
+                } else
+                {
+                    throw new System.Exception("Descendents can't add a null child");
+                }
+                
             }
         }
 
@@ -319,10 +422,11 @@ public class Part_Creator : MonoBehaviour
     //This takes in a node reference from the player blueprint
     public void UpdateEdgeList(Node newNode, bool addition)
     {
+        //this needs to check if an added piece is valid and then add a reference to masterB not playerB.
         if (addition)
         {
             edgeList.Add(newNode);
-
+        
             int nullChildCount = 0;
             foreach (var child in newNode.parent.children)
             {

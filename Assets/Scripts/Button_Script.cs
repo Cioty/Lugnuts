@@ -7,26 +7,31 @@ using UnityEngine.EventSystems;
 
 public class Button_Script : MonoBehaviour
 {
-    public Part_Creator partCreator;
-    public Animator chuteDoorAnimator;
-    public Animator[] crateAnimators;
-    public Animator crateConveyerAnimator;
-    public Animator thisAnimator;
-    public bool buttonDone = true;
+    public Game_Manager gameManager;
+    private Part_Manager partManager;
+    private Part_Creator partCreator;
+    private Crate_Manager crateManager;
+    //public Animator chuteDoorAnimator;
+    //public Animator[] crateAnimators;
+    //public Animator crateConveyerAnimator;
+    private Animator thisAnimator;
+    [HideInInspector]
+    public bool buttonDone = false;
+
+    //part parent gets reset to this position
+    private GameObject partParentLocation;
+    //part Parent
+    private GameObject partParent;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         thisAnimator = gameObject.GetComponent<Animator>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        //if(Input.GetKeyDown(KeyCode.H))
-       // {
-       //     ButtonPress();
-       // } 
+        partManager = gameManager.partManager;
+        partCreator = gameManager.partCreator;
+        crateManager = gameManager.crateManager;
+        partParentLocation = gameManager.partParentLocation;
+        partParent = gameManager.partCreator.partParent;
     }
 
     public void ButtonPress()
@@ -34,24 +39,20 @@ public class Button_Script : MonoBehaviour
         if (buttonDone) //how interact with apk
         {
             Audio_Manager.Play("Button");
-            thisAnimator.SetTrigger("Press");
+            thisAnimator.SetBool("Pressed", true);
             buttonDone = false;
-           partCreator.CreateParts();
+
+            //maybe add a delay?
+            partManager.NonCoreRemovePart();
+            partParent.transform.position = partParentLocation.transform.position;
+
+            StartCoroutine(crateManager.CrateCycle());
+            //create parts is in crate manager as it manages the transition
         } //else play unsuccessful press sound
     }
 
-    public void StartConveyer()
+    public void ButtonPressEnd()
     {
-        
-    }
-
-    public void StopConveyer()
-    {
-
-    }
-
-    public void ResetAnimatorBool(Animator animator, int fuckyou)
-    {
-        
+        thisAnimator.SetBool("Pressed", false);
     }
 }

@@ -198,7 +198,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1ac7f5614cd717e44a2d79a8df6b7353, type: 2}
+  - {fileID: 2100000, guid: 39f50a6936c387f40aa41e9717ce01ac, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -331,12 +331,33 @@ MonoBehaviour:
   shape: 0
   color: 0
   flipped: 0
+  masterBlueprintReference:
+    children: []
+    childrenValid: 
+    totalWeight: 0
+    id: 0
+    shape: 0
+    color: 0
+    flipped: 0
+    size: 0
+    demonstrationObject: {fileID: 0}
   globalPartManager: {fileID: 0}
   socketLaser: {fileID: 0}
   socketList:
   - {fileID: 2153134379395526133}
   - {fileID: 5474664057462390149}
   - {fileID: 611286961934782565}
+  socketOccupied: 
+  thisNode:
+    children: []
+    childrenValid: 
+    totalWeight: 0
+    id: 0
+    shape: 0
+    color: 0
+    flipped: 0
+    size: 0
+    demonstrationObject: {fileID: 0}
   colorAttackTime: 0.2
   colorSustainTime: 0.3
   silhouetteAttackTime: 0.2
@@ -746,6 +767,16 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2631617923958911594, guid: ff6b17c0871f67248b94af760d322575,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 39f50a6936c387f40aa41e9717ce01ac, type: 2}
+    - target: {fileID: 2631617923958911594, guid: ff6b17c0871f67248b94af760d322575,
+        type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: 39f50a6936c387f40aa41e9717ce01ac, type: 2}
     - target: {fileID: 2631617923958911595, guid: ff6b17c0871f67248b94af760d322575,
         type: 3}
       propertyPath: playOnAwake

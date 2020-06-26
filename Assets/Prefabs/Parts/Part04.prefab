@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1460031260270712282}
   m_Layer: 0
   m_Name: Part04
-  m_TagString: Untagged
+  m_TagString: Part
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -50,13 +50,97 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shape: 4
-  color: 1
-  flipped: 1
+  color: 0
+  flipped: 0
+  masterBlueprintReference:
+    children:
+    - children:
+      - children:
+        - children:
+          - children: []
+            childrenValid: 
+            totalWeight: 186.5188
+            id: 18
+            shape: 0
+            color: 0
+            flipped: 0
+            size: 100
+            demonstrationObject: {fileID: 0}
+          childrenValid: 01
+          totalWeight: 156.5188
+          id: 17
+          shape: 1
+          color: 1
+          flipped: 0
+          size: 100
+          demonstrationObject: {fileID: 0}
+        childrenValid: 01
+        totalWeight: 126.51879
+        id: 14
+        shape: 2
+        color: 0
+        flipped: 0
+        size: 100
+        demonstrationObject: {fileID: 0}
+      childrenValid: 01
+      totalWeight: 96.51879
+      id: 11
+      shape: 2
+      color: 1
+      flipped: 0
+      size: 100
+      demonstrationObject: {fileID: 0}
+    - children:
+      - children:
+        - children: []
+          childrenValid: 
+          totalWeight: 156.5188
+          id: 16
+          shape: 0
+          color: 1
+          flipped: 0
+          size: 100
+          demonstrationObject: {fileID: 0}
+        childrenValid: 01
+        totalWeight: 126.51879
+        id: 15
+        shape: 1
+        color: 0
+        flipped: 0
+        size: 100
+        demonstrationObject: {fileID: 0}
+      childrenValid: 01
+      totalWeight: 96.51879
+      id: 12
+      shape: 3
+      color: 1
+      flipped: 1
+      size: 100
+      demonstrationObject: {fileID: 0}
+    childrenValid: 0101
+    totalWeight: 66.51879
+    id: 8
+    shape: 4
+    color: 0
+    flipped: 0
+    size: 100
+    demonstrationObject: {fileID: 0}
   globalPartManager: {fileID: 0}
   socketLaser: {fileID: 0}
   socketList:
   - {fileID: 4244560239935173910}
   - {fileID: 4497733311134631808}
+  socketOccupied: 
+  thisNode:
+    children: []
+    childrenValid: 
+    totalWeight: 0
+    id: 0
+    shape: 0
+    color: 0
+    flipped: 0
+    size: 0
+    demonstrationObject: {fileID: 0}
   colorAttackTime: 0.2
   colorSustainTime: 0.3
   silhouetteAttackTime: 0.2
@@ -69,11 +153,11 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3839811871736347097}
   serializedVersion: 2
-  m_Mass: 0.3
+  m_Mass: 5
   m_Drag: 0.1
   m_AngularDrag: 0.4
-  m_UseGravity: 1
-  m_IsKinematic: 0
+  m_UseGravity: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0

@@ -154,7 +154,7 @@ GameObject:
   - component: {fileID: 603042239897778762}
   m_Layer: 0
   m_Name: Part02
-  m_TagString: Untagged
+  m_TagString: Part
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -188,33 +188,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shape: 2
-  color: 1
+  color: 0
   flipped: 0
   masterBlueprintReference:
     children:
     - children:
       - children: []
         childrenValid: 
-        totalWeight: 90
-        id: 9
+        totalWeight: 186.5188
+        id: 18
         shape: 0
-        color: 1
+        color: 0
         flipped: 0
         size: 100
         demonstrationObject: {fileID: 0}
-      childrenValid: 
-      totalWeight: 60
-      id: 4
-      shape: 3
-      color: 0
+      childrenValid: 01
+      totalWeight: 156.5188
+      id: 17
+      shape: 1
+      color: 1
       flipped: 0
       size: 100
       demonstrationObject: {fileID: 0}
-    childrenValid: 00
-    totalWeight: 30
-    id: 1
+    childrenValid: 01
+    totalWeight: 126.51879
+    id: 14
     shape: 2
-    color: 1
+    color: 0
     flipped: 0
     size: 100
     demonstrationObject: {fileID: 0}
@@ -245,11 +245,11 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8638169824665122386}
   serializedVersion: 2
-  m_Mass: 0.3
+  m_Mass: 5
   m_Drag: 0.1
   m_AngularDrag: 0.4
-  m_UseGravity: 1
-  m_IsKinematic: 0
+  m_UseGravity: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0

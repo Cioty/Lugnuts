@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Socket
+  - Part
   layers:
   - Default
   - TransparentFX

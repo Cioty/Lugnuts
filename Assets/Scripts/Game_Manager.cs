@@ -10,6 +10,11 @@ public class Game_Manager : MonoBehaviour
     public Part_Creator partCreator;
     public Socket_Laser socketLaser;
     public Crate_Manager crateManager;
+    public Button_Script buttonScript;
+    public Lever leverScript;
+
+    //part Parent location reference
+    public GameObject partParentLocation;
 
     //this gets incremented when you send off an incorrect model
     public int failureAmount = 0;
@@ -39,23 +44,40 @@ public class Game_Manager : MonoBehaviour
     public void Start()
     {
         NewLine();
+
+        //maybe add feedback here
+
+        //call new model
+
     }
 
     public void Success()
     {
         modelNumber++;
+        partManager.PartRemove();
+
+        //maybe add feedback here
+
+        NewModel();
+
     }
 
     public void Failure()
     {
         failureAmount++;
+        partManager.PartRemove();
 
         if(failureAmount == failureMax)
         {
             //reset then NewLine()
 
             NewLine();
+        } else
+        {
+            NewModel();
+            partCreator.NewModel2();
         }
+        
     }
 
     public void RemoveCore()
@@ -66,14 +88,14 @@ public class Game_Manager : MonoBehaviour
     public void NewLine()
     {
         partGeneration.GenerateMasterBlueprint();
-        partManager.CreatePlayerBlueprint();
+        //create player blueprint moved from here to new line
         NewModel();
         partCreator.NewLine();
-        
     }
 
     public void NewModel()
     {
-        partManager.SubsetBlueprint(modelNumber + modelNumberPlus); /*partManager.masterBlueprint.Count- 1*/ /*modelNumber + modelNumberPlus*/
+        partManager.CreatePlayerBlueprint();
+        partManager.SubsetBlueprint(partManager.masterBlueprint.Count - 1); /*partManager.masterBlueprint.Count- 1*/ /*modelNumber + modelNumberPlus*/
     }
 }

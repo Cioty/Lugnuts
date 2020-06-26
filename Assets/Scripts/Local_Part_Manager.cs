@@ -53,6 +53,11 @@ public class Local_Part_Manager : MonoBehaviour
     private bool holdingPiece;
     private Transform origParent;
 
+    // stores the script of a parent part.
+    private Local_Part_Manager parentPartScript;
+    private GameObject parentSocket;
+    private GameObject[] childObjects;
+
     //stores true when this part is on the player's robot model
     private bool onModel;
 
@@ -93,13 +98,15 @@ public class Local_Part_Manager : MonoBehaviour
         {
             masterBlueprintReference = globalPartManager.masterBlueprint[0];
         }
+
+        childObjects = new GameObject[socketList.Count];
     }
 
     public void SetMasterBlueprintRef(Node masterNode)
     {
-        Debug.Log("ran");
+        //Debug.Log("ran");
         masterBlueprintReference = masterNode;
-        Debug.Log($"Master blueprint ref = {masterBlueprintReference.shape}");
+        //Debug.Log($"Master blueprint ref = {masterBlueprintReference.shape}");
     }
 
     private void SocketToggle(bool enable, GameObject specificSocket = null)
@@ -131,17 +138,11 @@ public class Local_Part_Manager : MonoBehaviour
     public void Connect(GameObject socket)
     {
         PlayParticleSystem(socket);
-        Debug.Log("connect triggered");
-
-        
     }
 
     public void Disconnect(GameObject socket)
     {
         PlayParticleSystem(socket, false);
-        Debug.Log("disconnect triggered");
-
-        
     }
 
     public void SetRotate(GameObject socket)
@@ -280,7 +281,9 @@ public class Local_Part_Manager : MonoBehaviour
         localRigidBody.isKinematic = true;
         localRigidBody.useGravity = false;
 
-        socket.transform.parent.gameObject.GetComponent<Local_Part_Manager>().SocketToggle(false, socket);
+        parentPartScript = socket.transform.parent.gameObject.GetComponent<Local_Part_Manager>();
+        parentSocket = socket;
+        parentPartScript.SocketToggle(false, socket);
 
     }
     public void RemoveFromModel()
@@ -288,6 +291,13 @@ public class Local_Part_Manager : MonoBehaviour
         targetPosition = null;
         targetRotation = null;
         onModel = false;
+
+        parentPartScript.SocketToggle(true, parentSocket);
+    }
+
+    public void RemoveRecursive()
+    {
+
     }
 
     private void Update()
@@ -303,7 +313,7 @@ public class Local_Part_Manager : MonoBehaviour
 
         if (holdingPiece || onModel)
         {
-            Debug.Log(masterBlueprintReference);
+            //Debug.Log(masterBlueprintReference);
 
             //var moveTowards = Vector3.MoveTowards(transform.position, targetPosition, maxReadjustSpeed);
             //localRigidBody.velocity.Set(moveTowards.x, moveTowards.y, moveTowards.z);
