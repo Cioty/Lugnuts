@@ -82,7 +82,7 @@ QualitySettings:
     name: Medium
     pixelLightCount: 4
     shadows: 1
-    shadowResolution: 1
+    shadowResolution: 2
     shadowProjection: 1
     shadowCascades: 1
     shadowDistance: 20

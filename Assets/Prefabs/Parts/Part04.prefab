@@ -54,72 +54,54 @@ MonoBehaviour:
   flipped: 0
   masterBlueprintReference:
     children:
-    - children:
-      - children:
-        - children:
-          - children: []
-            childrenValid: 
-            totalWeight: 186.5188
-            id: 18
-            shape: 0
-            color: 0
-            flipped: 0
-            size: 100
-            demonstrationObject: {fileID: 0}
-          childrenValid: 01
-          totalWeight: 156.5188
-          id: 17
-          shape: 1
-          color: 1
-          flipped: 0
-          size: 100
-          demonstrationObject: {fileID: 0}
-        childrenValid: 01
-        totalWeight: 126.51879
-        id: 14
-        shape: 2
-        color: 0
-        flipped: 0
-        size: 100
-        demonstrationObject: {fileID: 0}
-      childrenValid: 01
-      totalWeight: 96.51879
-      id: 11
-      shape: 2
-      color: 1
+    - children: []
+      childrenValid: 
+      totalWeight: 70.36878
+      id: 6
+      shape: 0
+      color: 0
       flipped: 0
       size: 100
       demonstrationObject: {fileID: 0}
     - children:
       - children:
-        - children: []
-          childrenValid: 
-          totalWeight: 156.5188
-          id: 16
-          shape: 0
-          color: 1
+        - children:
+          - children: []
+            childrenValid: 
+            totalWeight: 160.36877
+            id: 13
+            shape: 0
+            color: 1
+            flipped: 0
+            size: 100
+            demonstrationObject: {fileID: 0}
+          childrenValid: 01
+          totalWeight: 130.36877
+          id: 11
+          shape: 3
+          color: 0
           flipped: 0
           size: 100
           demonstrationObject: {fileID: 0}
         childrenValid: 01
-        totalWeight: 126.51879
-        id: 15
-        shape: 1
+        totalWeight: 100.36878
+        id: 9
+        shape: 2
         color: 0
-        flipped: 0
+        flipped: 1
         size: 100
         demonstrationObject: {fileID: 0}
       childrenValid: 01
-      totalWeight: 96.51879
-      id: 12
+      totalWeight: 70.36878
+      id: 7
       shape: 3
       color: 1
       flipped: 1
       size: 100
       demonstrationObject: {fileID: 0}
     childrenValid: 0101
-    totalWeight: 66.51879
-    id: 8
+    totalWeight: 40.368782
+    id: 3
     shape: 4
     color: 0
     flipped: 0

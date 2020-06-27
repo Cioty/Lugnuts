@@ -243,7 +243,7 @@ MonoBehaviour:
     children:
     - children: []
       childrenValid: 
-      totalWeight: 186.5188
+      totalWeight: 300
       id: 18
       shape: 0
       color: 0
@@ -251,7 +251,7 @@ MonoBehaviour:
       size: 100
       demonstrationObject: {fileID: 0}
     childrenValid: 01
-    totalWeight: 156.5188
+    totalWeight: 270
     id: 17
     shape: 1
     color: 1
@@ -288,8 +288,8 @@ Rigidbody:
   m_Mass: 5
   m_Drag: 0.1
   m_AngularDrag: 0.4
-  m_UseGravity: 0
-  m_IsKinematic: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
