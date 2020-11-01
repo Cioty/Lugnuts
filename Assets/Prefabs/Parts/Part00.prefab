@@ -52,8 +52,8 @@ MonoBehaviour:
   masterBlueprintReference:
     children: []
     childrenValid: 
-    totalWeight: 300
-    id: 18
+    totalWeight: 30
+    id: 3
     shape: 0
     color: 0
     flipped: 0
@@ -88,8 +88,8 @@ Rigidbody:
   m_Mass: 5
   m_Drag: 0.1
   m_AngularDrag: 0.4
-  m_UseGravity: 0
-  m_IsKinematic: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0

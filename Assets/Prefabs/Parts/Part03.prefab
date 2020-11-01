@@ -93,24 +93,75 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shape: 3
-  color: 0
+  color: 1
   flipped: 0
   masterBlueprintReference:
     children:
-    - children: []
-      childrenValid: 
-      totalWeight: 160.36877
-      id: 13
-      shape: 0
+    - children:
+      - children:
+        - children:
+          - children:
+            - children:
+              - children:
+                - totalWeight: 240
+                  id: 17
+                  shape: 2
+                  color: 1
+                  flipped: 1
+                  size: 100
+                childrenValid: 01
+                totalWeight: 210
+                id: 16
+                shape: 1
+                color: 0
+                flipped: 0
+                size: 100
+                demonstrationObject: {fileID: 0}
+              childrenValid: 01
+              totalWeight: 180
+              id: 15
+              shape: 2
+              color: 1
+              flipped: 1
+              size: 100
+              demonstrationObject: {fileID: 0}
+            childrenValid: 01
+            totalWeight: 150
+            id: 13
+            shape: 1
+            color: 1
+            flipped: 0
+            size: 100
+            demonstrationObject: {fileID: 0}
+          childrenValid: 01
+          totalWeight: 120
+          id: 11
+          shape: 2
+          color: 1
+          flipped: 1
+          size: 100
+          demonstrationObject: {fileID: 0}
+        childrenValid: 01
+        totalWeight: 90
+        id: 7
+        shape: 3
+        color: 0
+        flipped: 1
+        size: 100
+        demonstrationObject: {fileID: 0}
+      childrenValid: 01
+      totalWeight: 60
+      id: 5
+      shape: 1
       color: 1
       flipped: 0
       size: 100
       demonstrationObject: {fileID: 0}
     childrenValid: 01
-    totalWeight: 130.36877
-    id: 11
+    totalWeight: 30
+    id: 1
     shape: 3
-    color: 0
+    color: 1
     flipped: 0
     size: 100
     demonstrationObject: {fileID: 0}

@@ -188,7 +188,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shape: 2
-  color: 0
+  color: 1
   flipped: 1
   masterBlueprintReference:
     children:
@@ -196,61 +196,52 @@ MonoBehaviour:
       - children:
         - children:
           - children:
-            - children:
-              - children: []
-                childrenValid: 
-                totalWeight: 300
-                id: 18
-                shape: 0
-                color: 0
-                flipped: 0
-                size: 100
-                demonstrationObject: {fileID: 0}
-              childrenValid: 01
+            - children: []
+              childrenValid: 
               totalWeight: 270
-              id: 17
-              shape: 1
-              color: 1
+              id: 18
+              shape: 0
+              color: 0
               flipped: 0
               size: 100
               demonstrationObject: {fileID: 0}
             childrenValid: 01
             totalWeight: 240
-            id: 16
+            id: 17
             shape: 2
-            color: 0
+            color: 1
             flipped: 1
             size: 100
             demonstrationObject: {fileID: 0}
           childrenValid: 01
           totalWeight: 210
-          id: 15
+          id: 16
           shape: 1
-          color: 1
+          color: 0
           flipped: 0
           size: 100
           demonstrationObject: {fileID: 0}
         childrenValid: 01
         totalWeight: 180
-        id: 14
-        shape: 3
-        color: 0
+        id: 15
+        shape: 2
+        color: 1
         flipped: 1
         size: 100
         demonstrationObject: {fileID: 0}
       childrenValid: 01
       totalWeight: 150
-      id: 12
-      shape: 3
-      color: 0
+      id: 13
+      shape: 1
+      color: 1
       flipped: 0
       size: 100
       demonstrationObject: {fileID: 0}
     childrenValid: 01
     totalWeight: 120
-    id: 10
+    id: 11
     shape: 2
-    color: 0
+    color: 1
     flipped: 1
     size: 100
     demonstrationObject: {fileID: 0}
